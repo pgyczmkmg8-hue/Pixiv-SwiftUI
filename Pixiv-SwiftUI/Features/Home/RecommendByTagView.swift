@@ -71,6 +71,18 @@ struct RecommendByTagView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.top, 64)
+                    } else if filteredIllusts.isEmpty {
+                        VStack(spacing: 12) {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .font(.system(size: 48))
+                                .foregroundColor(.gray)
+                            Text("설정에 따라 모든 일러스트가 필터링되었습니다")
+                                .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 64)
                     } else {
                         WaterfallGrid(data: filteredIllusts, columnCount: dynamicColumnCount, width: waterfallWidth, aspectRatio: { $0.safeAspectRatio }) { illust, columnWidth in
                             IllustDetailNavigationLink(
