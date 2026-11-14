@@ -1,29 +1,48 @@
 import Foundation
 import os.log
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
-struct GitHubRelease: Codable {
+struct GitLabRelease: Codable {
     let tagName: String
-    let name: String
-    let body: String?
-    let htmlUrl: String
-    let assets: [ReleaseAsset]
+    let name: String?
+    let description: String?
+    let links: Links?
+    let assets: Assets?
+
+    struct Links: Codable {
+        let selfUrl: String?
+
+        enum CodingKeys: String, CodingKey {
+            case selfUrl = "self"
+        }
+    }
+
+    struct Assets: Codable {
+        let links: [AssetLink]
+    }
+
+    struct AssetLink: Codable {
+        let name: String
+        let url: String
+        let directAssetUrl: String?
+
+        enum CodingKeys: String, CodingKey {
+            case name
+            case url
+            case directAssetUrl = "direct_asset_url"
+        }
+    }
 
     enum CodingKeys: String, CodingKey {
         case tagName = "tag_name"
         case name
-        case body
-        case htmlUrl = "html_url"
+        case description
+        case links = "_links"
         case assets
-    }
-}
-
-struct ReleaseAsset: Codable {
-    let name: String
-    let browserDownloadUrl: String
-
-    enum CodingKeys: String, CodingKey {
-        case name
-        case browserDownloadUrl = "browser_download_url"
     }
 }
 
@@ -31,6 +50,8 @@ enum UpdateCheckerError: LocalizedError {
     case networkError(String)
     case decodingError(String)
     case noReleaseFound
+    case unauthorized
+    case rateLimited
 
     var errorDescription: String? {
         switch self {
@@ -40,6 +61,10 @@ enum UpdateCheckerError: LocalizedError {
             return "파싱 오류: \(message)"
         case .noReleaseFound:
             return "릴리즈 버전을 찾을 수 없습니다"
+        case .rateLimited:
+            return "요청이 너무 많아 잠시 제한되었습니다. 잠시 후 다시 시도하세요. 토큰을 저장하면 제한이 완화됩니다"
+        case .unauthorized:
+            return "접근 권한이 없습니다. 저장소가 비공개라면 읽기 전용 토큰을 저장하거나 토큰이 만료되지 않았는지 확인하세요"
         }
     }
 }
@@ -54,33 +79,11 @@ struct AppUpdateInfo: Identifiable {
 
     var isNewerThanCurrent: Bool {
         guard let currentVersion = currentAppVersion else { return false }
-        return compareVersions(new: version, current: currentVersion) > 0
+        return UpdateChecker.compareVersions(new: version, current: currentVersion) > 0
     }
 
     private var currentAppVersion: String? {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    }
-
-    private func compareVersions(new: String, current: String) -> Int {
-        let newComponents = new.trimmingCharacters(in: CharacterSet(charactersIn: "v"))
-            .split(separator: ".").compactMap { Int($0) }
-        let currentComponents = current.trimmingCharacters(in: CharacterSet(charactersIn: "v"))
-            .split(separator: ".").compactMap { Int($0) }
-
-        let maxLength = max(newComponents.count, currentComponents.count)
-
-        for i in 0..<maxLength {
-            let newPart = i < newComponents.count ? newComponents[i] : 0
-            let currentPart = i < currentComponents.count ? currentComponents[i] : 0
-
-            if newPart > currentPart {
-                return 1
-            } else if newPart < currentPart {
-                return -1
-            }
-        }
-
-        return 0
     }
 }
 
@@ -88,16 +91,46 @@ struct AppUpdateInfo: Identifiable {
 final class UpdateChecker {
     static let shared = UpdateChecker()
 
-    private let githubAPIURL = "https://api.github.com/repos/Eslzzyl/Pixiv-SwiftUI/releases/latest"
-    private let session: URLSession
+    static let repositoryPath = "Yami_Q_Ray/Pixiv-SwiftUI"
+    static let repositoryURL = "https://gitlab.com/Yami_Q_Ray/Pixiv-SwiftUI"
 
+    private let session: URLSession
     private let skippedUpdateVersionKey = "skippedUpdateVersion"
+    private let keychainService = "com.pixiv.app.update"
+    private let keychainAccount = "gitlab-read-token"
+
+    private(set) var lastError: String?
 
     private init() {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 15
         self.session = URLSession(configuration: config)
     }
+
+    // MARK: - Token
+
+    var savedToken: String {
+        (try? KeychainHelper.load(service: keychainService, account: keychainAccount)) ?? ""
+    }
+
+    var hasToken: Bool {
+        !savedToken.isEmpty
+    }
+
+    func saveToken(_ token: String) {
+        let trimmed = token.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            try? KeychainHelper.delete(service: keychainService, account: keychainAccount)
+        } else {
+            do {
+                try KeychainHelper.save(trimmed, service: keychainService, account: keychainAccount)
+            } catch {
+                Logger.updater.error("Failed to save update token: \(error.localizedDescription, privacy: .public)")
+            }
+        }
+    }
+
+    // MARK: - Skip version
 
     func skipVersion(_ version: String) {
         UserDefaults.standard.set(
@@ -115,125 +148,119 @@ final class UpdateChecker {
     }
 
     private func normalizedVersion(_ version: String) -> String {
-        version.trimmingCharacters(in: CharacterSet(charactersIn: "v"))
+        Self.normalizedVersion(version)
     }
+
+    nonisolated static func normalizedVersion(_ version: String) -> String {
+        var value = version.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
+        if let index = value.firstIndex(where: { $0 == "-" || $0 == "+" }) {
+            value = String(value[..<index])
+        }
+        return value
+    }
+
+    nonisolated static func compareVersions(new: String, current: String) -> Int {
+        let newComponents = normalizedVersion(new).split(separator: ".").compactMap { Int($0) }
+        let currentComponents = normalizedVersion(current).split(separator: ".").compactMap { Int($0) }
+
+        for index in 0..<max(newComponents.count, currentComponents.count) {
+            let newPart = index < newComponents.count ? newComponents[index] : 0
+            let currentPart = index < currentComponents.count ? currentComponents[index] : 0
+            if newPart != currentPart {
+                return newPart > currentPart ? 1 : -1
+            }
+        }
+        return 0
+    }
+
+    // MARK: - Check
 
     func checkForUpdate() async -> AppUpdateInfo? {
-        guard let url = URL(string: githubAPIURL) else {
-            return nil
-        }
+        lastError = nil
 
-        do {
-            let (data, response) = try await session.data(from: url)
-
-            guard let httpResponse = response as? HTTPURLResponse else {
-                return nil
-            }
-
-            if httpResponse.statusCode == 403 || httpResponse.statusCode == 429 {
-                Logger.updater.debug("API rate limited, falling back to HTML parsing")
-                return await checkForUpdateFromHTML()
-            }
-
-            guard httpResponse.statusCode == 200 else {
-                Logger.updater.debug("API returned status code: \(httpResponse.statusCode)")
-                return await checkForUpdateFromHTML()
-            }
-
-            let decoder = JSONDecoder()
-            let release = try decoder.decode(GitHubRelease.self, from: data)
-
-            let downloadUrl = findDownloadUrl(for: release)
-
-            let updateInfo = AppUpdateInfo(
-                version: release.tagName.trimmingCharacters(in: CharacterSet(charactersIn: "v")),
-                releaseName: release.name,
-                releaseNotes: release.body ?? "업데이트 내역이 없습니다",
-                releaseUrl: release.htmlUrl,
-                downloadUrl: downloadUrl
-            )
-
-            return updateInfo
-        } catch {
-            Logger.updater.error("Failed to check for update: \(error.localizedDescription, privacy: .public)")
-            return await checkForUpdateFromHTML()
-        }
-    }
-
-    private func checkForUpdateFromHTML() async -> AppUpdateInfo? {
-        let htmlURL = "https://github.com/Eslzzyl/Pixiv-SwiftUI/releases/latest"
-
-        guard let url = URL(string: htmlURL) else {
+        let encodedPath = Self.repositoryPath.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
+        guard let url = URL(string: "https://gitlab.com/api/v4/projects/\(encodedPath)/releases?per_page=1&order_by=released_at&sort=desc") else {
             return nil
         }
 
         var request = URLRequest(url: url)
-        request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
+        let token = savedToken
+        if !token.isEmpty {
+            request.setValue(token, forHTTPHeaderField: "PRIVATE-TOKEN")
+        }
 
         do {
             let (data, response) = try await session.data(for: request)
 
-            guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode == 200,
-                  let html = String(data: data, encoding: .utf8) else {
-                Logger.updater.debug("Failed to fetch HTML page")
+            guard let httpResponse = response as? HTTPURLResponse else {
+                lastError = UpdateCheckerError.networkError("no response").errorDescription
                 return nil
             }
 
-            guard let redirectURL = httpResponse.url else {
-                Logger.updater.debug("No redirect URL found")
+            if httpResponse.statusCode == 429 {
+                lastError = UpdateCheckerError.rateLimited.errorDescription
                 return nil
             }
 
-            let tagPattern = "/releases/tag/([^/\"]+)"
-            guard let regex = try? NSRegularExpression(pattern: tagPattern),
-                  let match = regex.firstMatch(in: redirectURL.absoluteString, range: NSRange(redirectURL.absoluteString.startIndex..., in: redirectURL.absoluteString)),
-                  let range = Range(match.range(at: 1), in: redirectURL.absoluteString) else {
-                Logger.updater.debug("Could not extract version tag from URL")
+            if httpResponse.statusCode == 401 || httpResponse.statusCode == 403 || httpResponse.statusCode == 404 {
+                lastError = UpdateCheckerError.unauthorized.errorDescription
+                Logger.updater.debug("Release API status: \(httpResponse.statusCode)")
                 return nil
             }
 
-            let versionTag = String(redirectURL.absoluteString[range])
-            let version = versionTag.trimmingCharacters(in: CharacterSet(charactersIn: "v"))
-
-            var releaseNotes = "업데이트 내역이 없습니다"
-            if let titleRegex = try? NSRegularExpression(pattern: ">([^<]+) Release"),
-               let titleMatch = titleRegex.firstMatch(in: html, range: NSRange(html.startIndex..., in: html)),
-               let titleRange = Range(titleMatch.range(at: 1), in: html) {
-                releaseNotes = String(html[titleRange])
+            guard httpResponse.statusCode == 200 else {
+                lastError = UpdateCheckerError.networkError("HTTP \(httpResponse.statusCode)").errorDescription
+                Logger.updater.debug("Release API status: \(httpResponse.statusCode)")
+                return nil
             }
 
-            let updateInfo = AppUpdateInfo(
-                version: version,
-                releaseName: versionTag,
-                releaseNotes: releaseNotes,
-                releaseUrl: redirectURL.absoluteString,
-                downloadUrl: nil
+            let releases = try JSONDecoder().decode([GitLabRelease].self, from: data)
+            guard let release = releases.first else {
+                lastError = UpdateCheckerError.noReleaseFound.errorDescription
+                return nil
+            }
+
+            return AppUpdateInfo(
+                version: Self.normalizedVersion(release.tagName),
+                releaseName: release.name ?? release.tagName,
+                releaseNotes: release.description ?? "업데이트 내역이 없습니다",
+                releaseUrl: release.links?.selfUrl ?? "\(Self.repositoryURL)/-/releases",
+                downloadUrl: findDownloadUrl(for: release)
             )
-
-            return updateInfo
+        } catch let error as DecodingError {
+            lastError = UpdateCheckerError.decodingError(error.localizedDescription).errorDescription
+            Logger.updater.error("Failed to decode release: \(error.localizedDescription, privacy: .public)")
+            return nil
         } catch {
-            Logger.updater.error("Failed to parse HTML: \(error.localizedDescription, privacy: .public)")
+            lastError = UpdateCheckerError.networkError(error.localizedDescription).errorDescription
+            Logger.updater.error("Failed to check for update: \(error.localizedDescription, privacy: .public)")
             return nil
         }
     }
 
-    private func findDownloadUrl(for release: GitHubRelease) -> String? {
-        #if os(macOS)
-        let preferredNames = ["Pixiv-SwiftUI-arm64.dmg", "Pixiv-SwiftUI-x86_64.dmg"]
-        #elseif os(iOS)
-        let preferredNames = ["Pixiv-SwiftUI.ipa"]
-        #else
-        let preferredNames: [String] = []
-        #endif
+    private func findDownloadUrl(for release: GitLabRelease) -> String? {
+        let links = release.assets?.links ?? []
+        let ipa = links.first { $0.name.lowercased().hasSuffix(".ipa") }
+        return (ipa ?? links.first)?.url
+    }
 
-        for name in preferredNames {
-            if let asset = release.assets.first(where: { $0.name == name }) {
-                return asset.browserDownloadUrl
-            }
+    // MARK: - Install
+
+    /// Feather 앱으로 IPA를 바로 설치한다. 토큰이 필요한 비공개 저장소의 파일은 Feather가 받을 수 없고,
+    /// 토큰을 주소에 넣으면 노출되므로 토큰이 저장돼 있으면 쓰지 않는다.
+    var canInstallWithFeather: Bool {
+        !hasToken
+    }
+
+    func installWithFeather(downloadUrl: String) async -> Bool {
+        #if os(iOS)
+        guard canInstallWithFeather, let url = URL(string: "feather://install/\(downloadUrl)") else {
+            return false
         }
-
-        return release.assets.first?.browserDownloadUrl
+        return await UIApplication.shared.open(url)
+        #else
+        return false
+        #endif
     }
 
     var currentAppVersion: String? {

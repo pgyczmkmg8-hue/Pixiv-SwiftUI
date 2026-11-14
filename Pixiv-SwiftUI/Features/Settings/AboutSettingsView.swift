@@ -14,6 +14,9 @@ struct AboutSettingsView: View {
     @State private var showingUpdateAlert = false
     @State private var showingNoUpdateAlert = false
     @State private var checkError: String?
+    @State private var showingCheckErrorAlert = false
+    @State private var tokenInput = ""
+    @State private var tokenSaved = UpdateChecker.shared.hasToken
 
     var body: some View {
         VStack {
@@ -50,27 +53,19 @@ struct AboutSettingsView: View {
             resetButton
         }
         #endif
-        .alert("发现新版本", isPresented: $showingUpdateAlert) {
-            Button("取消", role: .cancel) { }
-            Button("跳过此版本") {
-                if let version = updateInfo?.version {
-                    UpdateChecker.shared.skipVersion(version)
-                }
-            }
-            Button("查看") {
-                if let urlString = updateInfo?.releaseUrl,
-                   let url = URL(string: urlString) {
-                    #if os(macOS)
-                    NSWorkspace.shared.open(url)
-                    #else
-                    UIApplication.shared.open(url)
-                    #endif
-                }
-            }
-        } message: {
+        .sheet(isPresented: $showingUpdateAlert) {
             if let info = updateInfo {
-                Text("버전 \(info.version)\n\n\(info.releaseNotes)")
+                UpdateAvailableSheet(
+                    updateInfo: info,
+                    isPresented: $showingUpdateAlert,
+                    onSkip: { UpdateChecker.shared.skipVersion(info.version) }
+                )
             }
+        }
+        .alert("업데이트 확인 실패", isPresented: $showingCheckErrorAlert) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text(checkError ?? "")
         }
         .alert("已是最新版本", isPresented: $showingNoUpdateAlert) {
             Button("确定", role: .cancel) { }
@@ -148,7 +143,7 @@ struct AboutSettingsView: View {
     }
 
     private var updateSection: some View {
-        Section(String(localized: "更新")) {
+        Section {
             Button {
                 checkForUpdate()
             } label: {
@@ -171,15 +166,44 @@ struct AboutSettingsView: View {
                     try? userSettingStore.setCheckUpdateOnLaunch(newValue)
                 }
             ))
+
+            SecureField("GitLab 읽기 전용 토큰 (비공개 저장소용)", text: $tokenInput)
+                .textContentType(.password)
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                #endif
+                .autocorrectionDisabled()
+
+            HStack {
+                Text(tokenSaved ? "토큰이 저장되어 있습니다" : "저장된 토큰 없음")
+                    .foregroundColor(.secondary)
+                Spacer()
+                Button("저장") {
+                    UpdateChecker.shared.saveToken(tokenInput)
+                    tokenInput = ""
+                    tokenSaved = UpdateChecker.shared.hasToken
+                }
+                .disabled(tokenInput.trimmingCharacters(in: .whitespaces).isEmpty)
+                if tokenSaved {
+                    Button("삭제", role: .destructive) {
+                        UpdateChecker.shared.saveToken("")
+                        tokenSaved = UpdateChecker.shared.hasToken
+                    }
+                }
+            }
+        } header: {
+            Text("업데이트")
+        } footer: {
+            Text("저장소가 공개라면 토큰은 필요 없습니다. 토큰이 있으면 Feather 바로 설치 대신 릴리즈 페이지가 열립니다.")
         }
     }
 
     private var linksSection: some View {
         Section("链接") {
-            if let githubURL = URL(string: "https://github.com/Eslzzyl/Pixiv-SwiftUI") {
+            if let githubURL = URL(string: UpdateChecker.repositoryURL) {
                 Link(destination: githubURL) {
                     HStack {
-                        Text("GitHub")
+                        Text("GitLab")
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
                             .foregroundColor(.secondary)
@@ -217,7 +241,8 @@ struct AboutSettingsView: View {
                         showingNoUpdateAlert = true
                     }
                 } else {
-                    checkError = "업데이트 확인 실패"
+                    checkError = UpdateChecker.shared.lastError ?? "업데이트 확인 실패"
+                    showingCheckErrorAlert = true
                 }
             }
         }

@@ -10,6 +10,23 @@ struct UpdateAvailableSheet: View {
     @Binding var isPresented: Bool
     let onSkip: () -> Void
 
+    private var canInstallWithFeather: Bool {
+        #if os(iOS)
+        updateInfo.downloadUrl != nil && UpdateChecker.shared.canInstallWithFeather
+        #else
+        false
+        #endif
+    }
+
+    private func openReleasePage() {
+        guard let url = URL(string: updateInfo.releaseUrl) else { return }
+        #if os(macOS)
+        NSWorkspace.shared.open(url)
+        #else
+        UIApplication.shared.open(url)
+        #endif
+    }
+
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "arrow.down.circle.fill")
@@ -44,15 +61,19 @@ struct UpdateAvailableSheet: View {
                 }
                 .buttonStyle(.bordered)
 
-                Button("查看更新") {
-                    if let url = URL(string: updateInfo.releaseUrl) {
-                        #if os(macOS)
-                        NSWorkspace.shared.open(url)
-                        #else
-                        UIApplication.shared.open(url)
-                        #endif
+                Button(canInstallWithFeather ? "Feather로 설치" : "查看更新") {
+                    if canInstallWithFeather, let downloadUrl = updateInfo.downloadUrl {
+                        Task {
+                            let opened = await UpdateChecker.shared.installWithFeather(downloadUrl: downloadUrl)
+                            if !opened {
+                                openReleasePage()
+                            }
+                            isPresented = false
+                        }
+                    } else {
+                        openReleasePage()
+                        isPresented = false
                     }
-                    isPresented = false
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -90,7 +111,7 @@ struct UpdateAvailableSheet: View {
             print(x)
             ```
             """,
-            releaseUrl: "https://github.com/Eslzzyl/Pixiv-SwiftUI/releases",
+            releaseUrl: "https://gitlab.com/Yami_Q_Ray/Pixiv-SwiftUI/-/releases",
             downloadUrl: nil
         ),
         isPresented: .constant(true),
