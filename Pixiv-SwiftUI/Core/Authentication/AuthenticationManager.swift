@@ -22,7 +22,7 @@ final class AuthenticationManager: NSObject {
     func startLogin(url: URL, callbackScheme: String) async throws -> URL {
         #if os(iOS) || os(macOS)
         guard presentationWindow() != nil else {
-            throw AppError.authenticationError("没有可用于显示登录页面的应用窗口")
+            throw AppError.authenticationError("로그인 화면을 표시할 앱 창이 없습니다")
         }
         #endif
 
@@ -42,7 +42,7 @@ final class AuthenticationManager: NSObject {
                 }
 
                 guard let callbackURL = callbackURL else {
-                    continuation.resume(throwing: AppError.authenticationError("未获取到回调 URL"))
+                    continuation.resume(throwing: AppError.authenticationError("콜백 URL을 받지 못했습니다"))
                     return
                 }
 

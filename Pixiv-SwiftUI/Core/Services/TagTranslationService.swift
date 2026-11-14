@@ -70,7 +70,7 @@ final class TagTranslationService {
             let number = String(tagName[numberRange])
             if !prefix.isEmpty {
                 let prefixTranslation = preferredTranslation(for: prefix) ?? prefix
-                return "\(prefixTranslation)\(number)生日"
+                return "\(prefixTranslation)\(number)번째 생일"
             }
         }
 
@@ -81,7 +81,7 @@ final class TagTranslationService {
             let prefix = String(tagName[prefixRange])
             if !prefix.isEmpty {
                 let prefixTranslation = preferredTranslation(for: prefix) ?? prefix
-                return "\(prefixTranslation)生日"
+                return "\(prefixTranslation) 생일"
             }
         }
 
@@ -93,7 +93,7 @@ final class TagTranslationService {
             let prefix = String(tagName[prefixRange])
             let number = String(tagName[numberRange])
             let prefixTranslation = prefix.isEmpty ? "" : (preferredTranslation(for: prefix) ?? prefix)
-            return "\(prefixTranslation)\(number)用户收藏"
+            return "\(prefixTranslation) 북마크 \(number)명 이상"
         }
 
         return nil

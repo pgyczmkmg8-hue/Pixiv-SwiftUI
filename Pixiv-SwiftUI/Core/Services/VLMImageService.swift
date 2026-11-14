@@ -79,7 +79,7 @@ enum VLMImageError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .imageEncodingFailed:
-            return "图片编码失败"
+            return "이미지 인코딩 실패"
         }
     }
 }

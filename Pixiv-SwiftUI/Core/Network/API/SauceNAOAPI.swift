@@ -33,7 +33,7 @@ final class SauceNAOAPI {
         }
 
         if httpResponse.statusCode == 429 {
-            throw AppError.networkError("搜索频率过快，请稍后再试")
+            throw AppError.networkError("검색 빈도가 너무 높습니다. 잠시 후 다시 시도하세요")
         }
 
         guard (200...299).contains(httpResponse.statusCode) else {
@@ -45,11 +45,11 @@ final class SauceNAOAPI {
         }
 
         if html.contains("Daily Search Limit Exceeded") {
-            throw AppError.networkError("已达到今日搜图上限")
+            throw AppError.networkError("오늘의 이미지 검색 한도에 도달했습니다")
         }
 
         if html.contains("Search Limit Exceeded") {
-            throw AppError.networkError("搜索太快啦，请歇会再试")
+            throw AppError.networkError("검색이 너무 빠릅니다. 잠시 쉬었다가 다시 시도하세요")
         }
 
         return try parseMatches(from: html)

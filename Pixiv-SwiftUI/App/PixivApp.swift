@@ -170,7 +170,7 @@ struct ContentView: View {
         }
         .onChange(of: accountStore.showTokenRefreshFailedToast) { _, newValue in
             if newValue {
-                toast.show("登录状态已过期，请重新登录", duration: 3.0)
+                toast.show("로그인 상태가 만료되었습니다. 다시 로그인하세요", duration: 3.0)
             }
         }
         .animation(.easeInOut(duration: 0.3), value: hasCompletedOnboarding)

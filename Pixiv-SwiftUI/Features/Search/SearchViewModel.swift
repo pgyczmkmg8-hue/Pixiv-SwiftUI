@@ -167,7 +167,7 @@ final class SearchViewModel {
                 await searchWithImageURL(url)
             }
         case .failure(let error):
-            showSauceToastMessage("读取图片失败: \(error.localizedDescription)")
+            showSauceToastMessage("이미지를 읽지 못했습니다: \(error.localizedDescription)")
         }
     }
 
@@ -186,7 +186,7 @@ final class SearchViewModel {
             let fileName = url.lastPathComponent.isEmpty ? "image.jpg" : url.lastPathComponent
             searchWithImageData(data, fileName: fileName)
         } catch {
-            showSauceToastMessage("读取图片失败: \(error.localizedDescription)")
+            showSauceToastMessage("이미지를 읽지 못했습니다: \(error.localizedDescription)")
         }
     }
 
@@ -213,7 +213,7 @@ final class SearchViewModel {
                 }
             } catch {
                 await MainActor.run {
-                    showSauceToastMessage("读取图片失败: \(error.localizedDescription)")
+                    showSauceToastMessage("이미지를 읽지 못했습니다: \(error.localizedDescription)")
                     selectedPhotoItem = nil
                 }
             }

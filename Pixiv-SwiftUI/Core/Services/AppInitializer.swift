@@ -27,8 +27,8 @@ final class AppInitializer {
 
         // 持久化失败时不能继续使用内存库，否则用户会在下次启动时看到账号和设置全部消失。
         guard dataContainer.isPersistent else {
-            let detail = dataContainer.persistenceErrorDescription ?? "未知原因"
-            self.initializationError = .databaseError("本地数据存储无法打开：\(detail)")
+            let detail = dataContainer.persistenceErrorDescription ?? "알 수 없는 원인"
+            self.initializationError = .databaseError("로컬 데이터 저장소를 열 수 없습니다: \(detail)")
             self.isLaunching = false
             return
         }
@@ -45,7 +45,7 @@ final class AppInitializer {
 
         guard aStore.error == nil, uStore.error == nil else {
             self.initializationError = aStore.error ?? uStore.error
-                ?? .databaseError("启动数据加载失败")
+                ?? .databaseError("시작 데이터 로드 실패")
             self.isLaunching = false
             return
         }

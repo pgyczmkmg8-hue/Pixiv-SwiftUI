@@ -78,7 +78,7 @@ final class DataContainer {
         self.modelContainer = fallbackContainer
         self.mainContext = ModelContext(fallbackContainer)
         self.isPersistent = false
-        self.persistenceErrorDescription = persistenceErrorDescription ?? "无法创建 SwiftData 容器"
+        self.persistenceErrorDescription = persistenceErrorDescription ?? "SwiftData 컨테이너를 만들 수 없습니다"
     }
 
     /// 创建一个最小化的内存 ModelContainer 作为最后回退

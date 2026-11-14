@@ -403,7 +403,7 @@ final class DownloadStore {
             } else {
                 Logger.download.warning("部分失败，失败页码: \(failedPages)")
                 taskItem.status = .failed
-                taskItem.error = lastError ?? "部分页面下载失败"
+                taskItem.error = lastError ?? "일부 페이지 다운로드 실패"
             }
 
             tasks[idx] = taskItem
@@ -626,7 +626,7 @@ final class DownloadStore {
             if let idx = tasks.firstIndex(where: { $0.id == task.id }) {
                 var taskItem = tasks[idx]
                 taskItem.status = .failed
-                taskItem.error = "导出格式缺失"
+                taskItem.error = "내보내기 형식이 없습니다"
                 tasks[idx] = taskItem
             }
             saveTasks(ownerId: ownerId)
@@ -766,7 +766,7 @@ final class DownloadStore {
             if let idx = tasks.firstIndex(where: { $0.id == task.id }) {
                 var taskItem = tasks[idx]
                 taskItem.status = .failed
-                taskItem.error = "系列章节信息缺失"
+                taskItem.error = "시리즈 챕터 정보가 없습니다"
                 tasks[idx] = taskItem
             }
             saveTasks(ownerId: ownerId)
@@ -901,7 +901,7 @@ final class DownloadStore {
 
             // 检查是否有足够的章节用于导出（至少要有一章）
             guard !novelsWithContent.isEmpty else {
-                throw NSError(domain: "NovelSeriesExport", code: -1, userInfo: [NSLocalizedDescriptionKey: "所有章节下载均失败"])
+                throw NSError(domain: "NovelSeriesExport", code: -1, userInfo: [NSLocalizedDescriptionKey: "모든 챕터 다운로드 실패"])
             }
 
             Logger.download.info("已下载 \(novelsWithContent.count) 章，失败 \(failedChapters.count) 章")
@@ -999,7 +999,7 @@ final class DownloadStore {
 
                 // 如果有失败的章节，记录在错误信息中
                 if !failedChapters.isEmpty {
-                    taskItem.error = "部分章节下载失败: \(failedChapters.map { String($0 + 1) }.joined(separator: ","))"
+                    taskItem.error = "일부 챕터 다운로드 실패: \(failedChapters.map { String($0 + 1) }.joined(separator: ","))"
                 }
 
                 tasks[idx] = taskItem

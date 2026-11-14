@@ -227,9 +227,9 @@ struct IllustRankingCard: View {
     }
     private func formatCount(_ count: Int) -> String {
         if count >= 10000 {
-            return String(format: "%.1f万", Double(count) / 10000)
+            return String(format: "%.1f만", Double(count) / 10000)
         } else if count >= 1000 {
-            return String(format: "%.1f千", Double(count) / 1000)
+            return String(format: "%.1f천", Double(count) / 1000)
         }
         return "\(count)"
     }

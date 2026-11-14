@@ -22,7 +22,7 @@ struct ImageTranslationPanelView: View {
     }
 
     private var headerTitle: String {
-        store.vlmExplanation.isEmpty ? "图片翻译" : "图片解释"
+        store.vlmExplanation.isEmpty ? "图片翻译" : "이미지 설명"
     }
 
     private var header: some View {
@@ -54,11 +54,11 @@ struct ImageTranslationPanelView: View {
         case .idle:
             emptyState
         case .loadingImage:
-            loadingState("正在加载图片…")
+            loadingState("이미지 로드 중…")
         case .recognizingText:
-            loadingState("正在识别文字…")
+            loadingState("글자 인식 중…")
         case .analyzingWithVLM:
-            loadingState("正在分析图片…")
+            loadingState("이미지 분석 중…")
         case .translating:
             translatingState
         case .completed:
@@ -88,7 +88,7 @@ struct ImageTranslationPanelView: View {
             ProgressView(value: store.progress)
                 .progressViewStyle(.linear)
                 .frame(width: 200)
-            Text("正在翻译… \(Int(store.progress * 100))%")
+            Text("번역 중… \(Int(store.progress * 100))%")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }

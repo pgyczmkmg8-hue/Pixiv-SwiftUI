@@ -125,7 +125,7 @@ final class UserSettingStore: AppSettingsProtocol {
                 applySetting(newSetting)
             }
         } catch {
-            self.error = AppError.databaseError("无法加载用户设置: \(error)")
+            self.error = AppError.databaseError("사용자 설정을 불러올 수 없습니다: \(error)")
             self.userSetting = UserSetting()
             self.isLoaded = true
         }
@@ -163,7 +163,7 @@ final class UserSettingStore: AppSettingsProtocol {
             await MainActor.run {
                 guard AccountStore.shared.currentUserId == currentUserId,
                       AccountStore.shared.accountGeneration == accountGeneration else { return }
-                self.error = AppError.databaseError("无法加载用户设置: \(error)")
+                self.error = AppError.databaseError("사용자 설정을 불러올 수 없습니다: \(error)")
                 self.isLoaded = true
             }
         }
@@ -192,7 +192,7 @@ final class UserSettingStore: AppSettingsProtocol {
         do {
             try normalizeIllustRankingModesIfNeeded()
         } catch {
-            self.error = AppError.databaseError("无法保存插画排行榜设置: \(error)")
+            self.error = AppError.databaseError("일러스트 랭킹 설정을 저장할 수 없습니다: \(error)")
         }
     }
 
@@ -1326,12 +1326,12 @@ final class UserSettingStore: AppSettingsProtocol {
 
     var availableTranslateServices: [(id: String, name: String, requiresSecret: Bool)] {
         [
-            ("google", "Google 网页翻译", false),
+            ("google", "Google 웹 번역", false),
             ("googleapi", "Google Translate API", false),
-            ("openai", "OpenAI 兼容服务", true),
-            ("baidu", "百度翻译", true),
-            ("bing", "Bing 翻译", false),
-            ("tencent", "腾讯翻译", true)
+            ("openai", "OpenAI 호환 서비스", true),
+            ("baidu", "바이두 번역", true),
+            ("bing", "Bing 번역", false),
+            ("tencent", "텐센트 번역", true)
         ]
     }
 

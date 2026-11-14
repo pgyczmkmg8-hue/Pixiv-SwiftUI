@@ -35,11 +35,11 @@ enum UpdateCheckerError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .networkError(let message):
-            return "网络错误: \(message)"
+            return "네트워크 오류: \(message)"
         case .decodingError(let message):
-            return "解析错误: \(message)"
+            return "파싱 오류: \(message)"
         case .noReleaseFound:
-            return "未找到发布版本"
+            return "릴리즈 버전을 찾을 수 없습니다"
         }
     }
 }
@@ -148,7 +148,7 @@ final class UpdateChecker {
             let updateInfo = AppUpdateInfo(
                 version: release.tagName.trimmingCharacters(in: CharacterSet(charactersIn: "v")),
                 releaseName: release.name,
-                releaseNotes: release.body ?? "暂无更新日志",
+                releaseNotes: release.body ?? "업데이트 내역이 없습니다",
                 releaseUrl: release.htmlUrl,
                 downloadUrl: downloadUrl
             )
@@ -196,7 +196,7 @@ final class UpdateChecker {
             let versionTag = String(redirectURL.absoluteString[range])
             let version = versionTag.trimmingCharacters(in: CharacterSet(charactersIn: "v"))
 
-            var releaseNotes = "暂无更新日志"
+            var releaseNotes = "업데이트 내역이 없습니다"
             if let titleRegex = try? NSRegularExpression(pattern: ">([^<]+) Release"),
                let titleMatch = titleRegex.firstMatch(in: html, range: NSRange(html.startIndex..., in: html)),
                let titleRange = Range(titleMatch.range(at: 1), in: html) {

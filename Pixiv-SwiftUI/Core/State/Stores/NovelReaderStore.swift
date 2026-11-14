@@ -181,7 +181,7 @@ final class NovelReaderStore {
             return
         } catch {
             guard isCurrentContent(generation) else { return }
-            translationError = "翻译失败，请检查服务配置"
+            translationError = "번역 실패. 서비스 설정을 확인하세요"
             Logger.novel.error("Translation failed for paragraph \(index): \(error.localizedDescription, privacy: .public)")
         }
     }
@@ -708,7 +708,7 @@ final class NovelReaderStore {
                         group.cancelAll()
                         return
                     }
-                    translationError = "批量翻译失败，已回退单段翻译"
+                    translationError = "일괄 번역에 실패해 단락별 번역으로 되돌렸습니다"
                     Logger.novel.error("Batch translation failed: \(message)")
 
                     for index in indices {

@@ -157,7 +157,7 @@ private final class SauceNaoResultListStore {
 
         guard let request = SauceNaoSearchRequestStore.shared.consume(requestId: requestId) else {
             hasSearched = true
-            error = AppError.networkError("请求已过期，请重新选择图片")
+            error = AppError.networkError("요청이 만료되었습니다. 이미지를 다시 선택하세요")
             return
         }
 

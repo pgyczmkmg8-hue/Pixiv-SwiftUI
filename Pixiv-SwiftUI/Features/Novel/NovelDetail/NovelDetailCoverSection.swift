@@ -84,7 +84,7 @@ struct NovelDetailCoverSection: View {
     private var buttonText: String {
         if let index = savedIndex, let total = savedTotal, total > 0 {
             let percentage = Int(Double(index) / Double(total) * 100)
-            return String(localized: "继续阅读（\(percentage)%）")
+            return String(localized: "이어서 읽기 (\(percentage)%)")
         } else if savedIndex != nil {
             return String(localized: "继续阅读")
         } else {

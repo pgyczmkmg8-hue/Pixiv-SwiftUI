@@ -412,8 +412,8 @@ enum ReaderFontFamily: String, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .default: return "系统默认"
-        case .serif: return "宋体 / 衬线"
+        case .default: return "시스템 기본"
+        case .serif: return "명조체 / 세리프"
         }
     }
 
@@ -443,7 +443,7 @@ enum ReaderTheme: String, Codable, CaseIterable {
         case .light: return "浅色"
         case .dark: return "深色"
         case .system: return "跟随系统"
-        case .sepia: return "护眼"
+        case .sepia: return "눈 보호"
         }
     }
 
@@ -470,15 +470,15 @@ enum TranslationDisplayMode: String, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .translationOnly: return "仅译文"
-        case .bilingual: return "原文对照"
+        case .translationOnly: return "번역문만"
+        case .bilingual: return "원문 대조"
         }
     }
 
     var description: String {
         switch self {
-        case .translationOnly: return "只显示译文，译文使用与原文相同的样式"
-        case .bilingual: return "同时显示原文和译文，译文使用稍次级的样式"
+        case .translationOnly: return "번역문만 표시하며, 번역문은 원문과 같은 스타일을 사용합니다"
+        case .bilingual: return "원문과 번역문을 함께 표시하며, 번역문은 약간 보조적인 스타일을 사용합니다"
         }
     }
 }

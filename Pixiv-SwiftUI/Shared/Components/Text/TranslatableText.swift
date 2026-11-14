@@ -76,7 +76,7 @@ struct TranslatableCommentTextView: View {
     private var copyButton: some View {
         Button {
             copyToClipboard(text)
-            toastMessage = "已复制到剪贴板"
+            toastMessage = "클립보드에 복사됨"
             showToast = true
         } label: {
             Label("复制", systemImage: "doc.on.doc")
@@ -152,7 +152,7 @@ struct TranslatableCommentTextView: View {
             } catch {
                 await MainActor.run {
                     isTranslating = false
-                    toastMessage = "翻译失败，请检查服务配置"
+                    toastMessage = "번역 실패. 서비스 설정을 확인하세요"
                     showToast = true
                 }
             }

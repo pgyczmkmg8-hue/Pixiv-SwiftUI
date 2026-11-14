@@ -80,9 +80,9 @@ enum KeychainError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidData:
-            return "钥匙串中的 WebDAV 凭据损坏，无法读取"
+            return "키체인의 WebDAV 자격 증명이 손상되어 읽을 수 없습니다"
         case .unhandledStatus(let status):
-            return "钥匙串访问失败（状态码：\(status)）"
+            return "키체인 접근 실패 (상태 코드: \(status))"
         }
     }
 }

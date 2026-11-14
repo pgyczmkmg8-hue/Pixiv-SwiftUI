@@ -206,9 +206,9 @@ struct BlockSettingView: View {
 
     private var novelTitleKeywordsSection: some View {
         keywordSection(
-            title: "小说标题拉黑关键词",
-            emptyText: "暂无小说标题拉黑关键词",
-            placeholder: "添加小说标题关键词",
+            title: "소설 제목 차단 키워드",
+            emptyText: "차단한 소설 제목 키워드 없음",
+            placeholder: "소설 제목 키워드 추가",
             keywords: userSettingStore.blockedNovelTitleKeywords,
             text: $newNovelTitleKeyword,
             addAction: { keyword in
@@ -222,9 +222,9 @@ struct BlockSettingView: View {
 
     private var novelSeriesKeywordsSection: some View {
         keywordSection(
-            title: "小说系列拉黑关键词",
-            emptyText: "暂无小说系列拉黑关键词",
-            placeholder: "添加小说系列关键词",
+            title: "소설 시리즈 차단 키워드",
+            emptyText: "차단한 소설 시리즈 키워드 없음",
+            placeholder: "소설 시리즈 키워드 추가",
             keywords: userSettingStore.blockedNovelSeriesKeywords,
             text: $newNovelSeriesKeyword,
             addAction: { keyword in
@@ -238,9 +238,9 @@ struct BlockSettingView: View {
 
     private var novelCaptionKeywordsSection: some View {
         keywordSection(
-            title: "小说简介拉黑关键词",
-            emptyText: "暂无小说简介拉黑关键词",
-            placeholder: "添加小说简介关键词",
+            title: "소설 소개 차단 키워드",
+            emptyText: "차단한 소설 소개 키워드 없음",
+            placeholder: "소설 소개 키워드 추가",
             keywords: userSettingStore.blockedNovelCaptionKeywords,
             text: $newNovelCaptionKeyword,
             addAction: { keyword in

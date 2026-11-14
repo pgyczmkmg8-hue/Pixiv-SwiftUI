@@ -13,7 +13,7 @@ struct ProfilePanelView: View {
     @State private var showingLogoutAlert = false
     @State private var showingClearCacheAlert = false
     @State private var refreshTokenToExport: String = ""
-    @State private var cacheSize: String = "计算中..."
+    @State private var cacheSize: String = "계산 중..."
     @State private var navigationRouter = PixivNavigationRouter()
     @SceneStorage("pixiv.profile.authSheet.presented") private var showingAuthView = false
     @State private var loginWebViewItem: LoginWebViewItem?
@@ -420,7 +420,7 @@ struct ProfilePanelView: View {
                 AnimatedAvatarImage(urlString: account.userImage, size: 60, expiration: DefaultCacheExpiration.myAvatar)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(account.name.isEmpty ? "Pixiv 用户" : account.name)
+                    Text(account.name.isEmpty ? "Pixiv 사용자" : account.name)
                         .font(.headline)
 
                     Text("@\(account.account)")
@@ -460,7 +460,7 @@ struct ProfilePanelView: View {
             let size = try await Kingfisher.ImageCache.default.diskStorageSize
             cacheSize = formatSize(Int(size))
         } catch {
-            cacheSize = "获取失败"
+            cacheSize = "가져오지 못했습니다"
         }
     }
 

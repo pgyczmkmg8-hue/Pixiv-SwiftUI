@@ -22,7 +22,7 @@ struct IllustLoaderView: View {
                     ContentUnavailableView(
                         "加载失败",
                         systemImage: "exclamationmark.triangle",
-                        description: Text(errorMessage ?? "未知错误")
+                        description: Text(errorMessage ?? "알 수 없는 오류")
                     )
                     Button("重试") {
                         loadIllust()
@@ -123,7 +123,7 @@ struct NovelLoaderView: View {
                     ContentUnavailableView(
                         "加载失败",
                         systemImage: "exclamationmark.triangle",
-                        description: Text(errorMessage ?? "未知错误")
+                        description: Text(errorMessage ?? "알 수 없는 오류")
                     )
                     Button("重试") {
                         loadNovel()

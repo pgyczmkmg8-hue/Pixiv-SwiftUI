@@ -154,7 +154,7 @@ final class RecommendViewModel {
                     contentType: requestContentType
                 ) else { return }
 
-                self.error = "刷新失败: \(error.localizedDescription)"
+                self.error = "새로고침 실패: \(error.localizedDescription)"
                 isLoading = false
             }
         }

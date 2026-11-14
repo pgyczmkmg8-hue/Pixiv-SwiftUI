@@ -19,6 +19,7 @@ final class PopularIllustSearcher {
     private static let tiers = [50000, 30000, 20000, 10000, 7500, 5000, 1000, 500, 250, 100]
     private static let pageSize = 30
     private static let pagesPerStep = 3
+    private static let fallbackPagesPerStep = 6
     private static let maxPagesPerTier = 17
 
     private let config: Configuration
@@ -36,7 +37,7 @@ final class PopularIllustSearcher {
         } else {
             let floor = max(config.minimumBookmarkCount, Self.tiers.last ?? 100)
             let filtered = Self.tiers.filter { $0 >= floor }
-            tiersToWalk = filtered.isEmpty ? [floor] : filtered
+            tiersToWalk = (filtered.isEmpty ? [floor] : filtered) + [0]
         }
     }
 
@@ -46,6 +47,7 @@ final class PopularIllustSearcher {
             let step = try await fetchStep()
             collected.append(contentsOf: step)
         }
+        collected.sort { $0.totalBookmarks > $1.totalBookmarks }
         return Batch(items: collected, hasMore: !isExhausted)
     }
 
@@ -53,7 +55,7 @@ final class PopularIllustSearcher {
         let tier = tiersToWalk[tierIndex]
         let word = tier > 0 ? "\(config.word) \(tier)users入り" : config.word
         let startOffset = offset
-        let pageCount = Self.pagesPerStep
+        let pageCount = tier == 0 ? Self.fallbackPagesPerStep : Self.pagesPerStep
 
         var pages: [[Illusts]] = []
         for index in 0..<pageCount {

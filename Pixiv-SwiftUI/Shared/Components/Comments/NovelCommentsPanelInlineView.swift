@@ -276,7 +276,7 @@ struct NovelCommentsPanelInlineView: View {
             cache.set(response, forKey: cacheKey, expiration: expiration)
             isLoadingComments = false
         } catch {
-            commentsError = "加载失败: \(error.localizedDescription)"
+            commentsError = "로드 실패: \(error.localizedDescription)"
             isLoadingComments = false
         }
     }
@@ -310,7 +310,7 @@ struct NovelCommentsPanelInlineView: View {
                 }
             } catch {
                 await MainActor.run {
-                    errorMessage = "发送失败: \(error.localizedDescription)"
+                    errorMessage = "전송 실패: \(error.localizedDescription)"
                     showErrorMessage = true
                     isSubmitting = false
                 }
@@ -331,7 +331,7 @@ struct NovelCommentsPanelInlineView: View {
 
         guard let commentUserId = comment.user?.id,
               String(commentUserId) == AccountStore.shared.currentUserId else {
-            errorMessage = "只能删除自己的评论"
+            errorMessage = "내 댓글만 삭제할 수 있습니다"
             showErrorMessage = true
             return
         }
@@ -355,7 +355,7 @@ struct NovelCommentsPanelInlineView: View {
             cache.remove(forKey: cacheKey)
             commentToDelete = nil
         } catch {
-            errorMessage = "删除失败: \(error.localizedDescription)"
+            errorMessage = "삭제 실패: \(error.localizedDescription)"
             showErrorMessage = true
         }
     }

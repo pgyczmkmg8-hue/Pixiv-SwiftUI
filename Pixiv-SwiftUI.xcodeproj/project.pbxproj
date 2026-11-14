@@ -103,6 +103,7 @@
 				en,
 				Base,
 				ja,
+				ko,
 				"zh-Hans",
 				"zh-Hant",
 			);

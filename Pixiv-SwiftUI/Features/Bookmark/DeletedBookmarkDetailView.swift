@@ -110,7 +110,7 @@ struct DeletedBookmarkDetailView: View {
                 toastView(message: "已复制")
             }
             if showSaveToast {
-                toastView(message: "保存成功")
+                toastView(message: "저장되었습니다")
             }
         }
     }

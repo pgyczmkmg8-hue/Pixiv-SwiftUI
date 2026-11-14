@@ -1044,7 +1044,7 @@ final class NetworkClient {
             let errorDescription: String
             if let directError = error as? PixivDirectConnectionError,
                case .timedOut = directError {
-                errorDescription = "HTTP/1.1 TCP 直连请求超时"
+                errorDescription = "HTTP/1.1 TCP 직접 연결 요청 시간 초과"
             } else {
                 errorDescription = error.localizedDescription
             }
@@ -1372,17 +1372,17 @@ enum NetworkError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "无效的 URL"
+            return "잘못된 URL"
         case .invalidResponse:
-            return "无效的服务器响应"
+            return "잘못된 서버 응답"
         case .httpError(let code):
-            return "HTTP 错误: \(code)"
+            return "HTTP 오류: \(code)"
         case .decodingError(let error):
-            return "数据解析错误: \(error.localizedDescription)"
+            return "데이터 파싱 오류: \(error.localizedDescription)"
         case .connectionError(let message):
-            return "连接错误: \(message)"
+            return "연결 오류: \(message)"
         case .rangeNotSupported:
-            return "服务器不支持分段下载"
+            return "서버가 분할 다운로드를 지원하지 않습니다"
         }
     }
 }

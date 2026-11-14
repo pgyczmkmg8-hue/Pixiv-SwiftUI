@@ -63,7 +63,7 @@ struct IconExportView: View {
         let savePanel = NSSavePanel()
         savePanel.allowedContentTypes = [.png]
         savePanel.nameFieldStringValue = "AppIcon_1024.png"
-        savePanel.title = "保存图标"
+        savePanel.title = "아이콘 저장"
 
         savePanel.begin { response in
             if response == .OK, let url = savePanel.url {

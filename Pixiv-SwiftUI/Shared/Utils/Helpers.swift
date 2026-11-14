@@ -572,11 +572,11 @@ struct DateFormatterHelper {
         let components = calendar.dateComponents([.day, .hour, .minute], from: parsedDate, to: now)
 
         if let day = components.day, day > 0 {
-            return "\(day) 天前"
+            return "\(day)일 전"
         } else if let hour = components.hour, hour > 0 {
-            return "\(hour) 小时前"
+            return "\(hour)시간 전"
         } else if let minute = components.minute, minute > 0 {
-            return "\(minute) 分钟前"
+            return "\(minute)분 전"
         } else {
             return "刚刚"
         }

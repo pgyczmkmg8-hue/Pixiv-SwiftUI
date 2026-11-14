@@ -181,7 +181,7 @@ struct SearchResultView: View {
                     .font(.system(size: 60))
                     .foregroundColor(.secondary)
 
-                Text("标签 \"\(word)\" 已被屏蔽")
+                Text("태그 \"\(word)\"이(가) 차단되었습니다")
                     .font(.title2)
                     .foregroundColor(.primary)
 

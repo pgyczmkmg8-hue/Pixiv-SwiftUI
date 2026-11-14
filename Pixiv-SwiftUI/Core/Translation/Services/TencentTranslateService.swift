@@ -53,7 +53,7 @@ final class TencentTranslateService: BaseTranslateService, TranslateService, @un
             return SecretValidationResult(
                 secret: defaultSecret,
                 status: false,
-                info: "未设置密钥。腾讯翻译需要 SecretId 和 SecretKey，格式为 secretId#secretKey#region(optional)#projectId(optional)"
+                info: "키가 설정되지 않았습니다. 텐센트 번역에는 SecretId와 SecretKey가 필요하며 형식은 secretId#secretKey#region(optional)#projectId(optional)입니다"
             )
         }
 
@@ -61,7 +61,7 @@ final class TencentTranslateService: BaseTranslateService, TranslateService, @un
             return SecretValidationResult(
                 secret: secret,
                 status: false,
-                info: "密钥格式错误。应为 secretId#secretKey#region(optional)#projectId(optional)，使用 '#' 分隔"
+                info: "키 형식 오류입니다. secretId#secretKey#region(optional)#projectId(optional) 형식이어야 하며 '#'으로 구분합니다"
             )
         }
 
@@ -70,7 +70,7 @@ final class TencentTranslateService: BaseTranslateService, TranslateService, @un
         return SecretValidationResult(
             secret: secret,
             status: secret != defaultSecret,
-            info: secret == defaultSecret ? "未设置密钥" : partsInfo
+            info: secret == defaultSecret ? "키가 설정되지 않았습니다" : partsInfo
         )
     }
 
@@ -90,7 +90,7 @@ final class TencentTranslateService: BaseTranslateService, TranslateService, @un
             if let secret = task.secret {
                 guard let parsedConfig = TencentTranslateConfig.parse(from: secret) else {
                     throw TranslateError.invalidSecretFormat(
-                        "腾讯翻译密钥格式应为 secretId#secretKey#region(optional)#projectId(optional)，使用 '#' 分隔"
+                        "텐센트 번역 키 형식은 secretId#secretKey#region(optional)#projectId(optional)이어야 하며 '#'으로 구분합니다"
                     )
                 }
                 return try await translateWithConfig(parsedConfig, task: &task)

@@ -41,7 +41,7 @@ struct TranslationSettingView: View {
     @State private var isTestingBing: Bool = false
     @State private var isTestingTencent: Bool = false
     @State private var isClearingCache: Bool = false
-    @State private var cacheSize: String = "计算中..."
+    @State private var cacheSize: String = "계산 중..."
     @State private var toastMessage: String = ""
     @State private var showToast: Bool = false
     @State private var showClearCacheConfirmation: Bool = false
@@ -759,7 +759,7 @@ struct TranslationSettingView: View {
             await MainActor.run {
                 isClearingCache = false
                 cacheSize = "0 B"
-                toastMessage = "缓存已清除"
+                toastMessage = "캐시를 지웠습니다"
                 showToast = true
             }
         }
@@ -832,7 +832,7 @@ struct TranslationSettingView: View {
                 )
 
                 let targetLang = userSettingStore.resolveTargetLanguage(targetLanguage)
-                let prompt = "请用\(targetLang)回复：这张图片中有什么文字？"
+                let prompt = "\(targetLang)(으)로 답해 주세요: 이 이미지에는 어떤 글자가 있나요?"
 
                 let messages: [LLMMessage] = [
                     LLMMessage(role: "user", content: .multimodal([
@@ -849,16 +849,16 @@ struct TranslationSettingView: View {
 
                 await MainActor.run {
                     if response.choices.first?.message.content.text.isEmpty == true {
-                        toastMessage = "测试成功，但未返回结果"
+                        toastMessage = "테스트 성공, 하지만 결과가 반환되지 않았습니다"
                     } else {
-                        toastMessage = "测试成功"
+                        toastMessage = "테스트 성공"
                     }
                     showToast = true
                     isTestingVLM = false
                 }
             } catch {
                 await MainActor.run {
-                    toastMessage = "测试失败: \(error.localizedDescription)"
+                    toastMessage = "테스트 실패: \(error.localizedDescription)"
                     showToast = true
                     isTestingVLM = false
                 }
@@ -883,16 +883,16 @@ struct TranslationSettingView: View {
                 await MainActor.run {
                     isTestingOpenAI = false
                     if !task.result.isEmpty {
-                        toastMessage = "测试成功"
+                        toastMessage = "테스트 성공"
                     } else {
-                        toastMessage = "测试成功，但未返回翻译结果"
+                        toastMessage = "테스트 성공, 하지만 번역 결과가 반환되지 않았습니다"
                     }
                     showToast = true
                 }
             } catch {
                 await MainActor.run {
                     isTestingOpenAI = false
-                    toastMessage = "测试失败: \(error.localizedDescription)"
+                    toastMessage = "테스트 실패: \(error.localizedDescription)"
                     showToast = true
                 }
             }
@@ -916,16 +916,16 @@ struct TranslationSettingView: View {
                 await MainActor.run {
                     isTestingBaidu = false
                     if !task.result.isEmpty {
-                        toastMessage = "测试成功"
+                        toastMessage = "테스트 성공"
                     } else {
-                        toastMessage = "测试成功，但未返回翻译结果"
+                        toastMessage = "테스트 성공, 하지만 번역 결과가 반환되지 않았습니다"
                     }
                     showToast = true
                 }
             } catch {
                 await MainActor.run {
                     isTestingBaidu = false
-                    toastMessage = "测试失败: \(error.localizedDescription)"
+                    toastMessage = "테스트 실패: \(error.localizedDescription)"
                     showToast = true
                 }
             }
@@ -953,16 +953,16 @@ struct TranslationSettingView: View {
                 await MainActor.run {
                     isTestingGoogle = false
                     if !task.result.isEmpty {
-                        toastMessage = "测试成功"
+                        toastMessage = "테스트 성공"
                     } else {
-                        toastMessage = "测试成功，但未返回翻译结果"
+                        toastMessage = "테스트 성공, 하지만 번역 결과가 반환되지 않았습니다"
                     }
                     showToast = true
                 }
             } catch {
                 await MainActor.run {
                     isTestingGoogle = false
-                    toastMessage = "测试失败: \(error.localizedDescription)"
+                    toastMessage = "테스트 실패: \(error.localizedDescription)"
                     showToast = true
                 }
             }
@@ -986,16 +986,16 @@ struct TranslationSettingView: View {
                 await MainActor.run {
                     isTestingGoogleAPI = false
                     if !task.result.isEmpty {
-                        toastMessage = "测试成功"
+                        toastMessage = "테스트 성공"
                     } else {
-                        toastMessage = "测试成功，但未返回翻译结果"
+                        toastMessage = "테스트 성공, 하지만 번역 결과가 반환되지 않았습니다"
                     }
                     showToast = true
                 }
             } catch {
                 await MainActor.run {
                     isTestingGoogleAPI = false
-                    toastMessage = "测试失败: \(error.localizedDescription)"
+                    toastMessage = "테스트 실패: \(error.localizedDescription)"
                     showToast = true
                 }
             }
@@ -1023,16 +1023,16 @@ struct TranslationSettingView: View {
                 await MainActor.run {
                     isTestingBing = false
                     if !task.result.isEmpty {
-                        toastMessage = "测试成功"
+                        toastMessage = "테스트 성공"
                     } else {
-                        toastMessage = "测试成功，但未返回翻译结果"
+                        toastMessage = "테스트 성공, 하지만 번역 결과가 반환되지 않았습니다"
                     }
                     showToast = true
                 }
             } catch {
                 await MainActor.run {
                     isTestingBing = false
-                    toastMessage = "测试失败: \(error.localizedDescription)"
+                    toastMessage = "테스트 실패: \(error.localizedDescription)"
                     showToast = true
                 }
             }
@@ -1066,16 +1066,16 @@ struct TranslationSettingView: View {
                 await MainActor.run {
                     isTestingTencent = false
                     if !task.result.isEmpty {
-                        toastMessage = "测试成功"
+                        toastMessage = "테스트 성공"
                     } else {
-                        toastMessage = "测试成功，但未返回翻译结果"
+                        toastMessage = "테스트 성공, 하지만 번역 결과가 반환되지 않았습니다"
                     }
                     showToast = true
                 }
             } catch {
                 await MainActor.run {
                     isTestingTencent = false
-                    toastMessage = "测试失败: \(error.localizedDescription)"
+                    toastMessage = "테스트 실패: \(error.localizedDescription)"
                     showToast = true
                 }
             }

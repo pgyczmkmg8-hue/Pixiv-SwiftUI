@@ -11,15 +11,15 @@ enum AppError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .networkError(let message):
-            return "网络错误: \(message)"
+            return "네트워크 오류: \(message)"
         case .databaseError(let message):
-            return "数据库错误: \(message)"
+            return "데이터베이스 오류: \(message)"
         case .decodingError(let message):
-            return "数据解析错误: \(message)"
+            return "데이터 파싱 오류: \(message)"
         case .authenticationError(let message):
-            return "认证错误: \(message)"
+            return "인증 오류: \(message)"
         case .unknown(let error):
-            return "未知错误: \(error.localizedDescription)"
+            return "알 수 없는 오류: \(error.localizedDescription)"
         }
     }
 }

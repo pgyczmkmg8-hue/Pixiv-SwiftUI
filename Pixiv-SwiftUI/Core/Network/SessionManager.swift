@@ -59,7 +59,7 @@ final class SessionManager {
 
         guard let refreshToken = AccountStore.shared.currentAccount?.refreshToken else {
             Logger.token.debug("无 refreshToken，无法刷新")
-            notifyTokenRefreshFailed(message: "无登录凭证，请重新登录")
+            notifyTokenRefreshFailed(message: "로그인 자격 증명이 없습니다. 다시 로그인하세요")
             return
         }
 

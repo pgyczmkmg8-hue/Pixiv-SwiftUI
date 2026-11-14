@@ -185,9 +185,9 @@ struct UgoiraLoadingStatusCard: View {
     private var titleText: String {
         switch state {
         case .downloading:
-            return "下载中"
+            return "다운로드 중"
         case .unzipping:
-            return "解压中"
+            return "압축 해제 중"
         }
     }
 
@@ -196,11 +196,11 @@ struct UgoiraLoadingStatusCard: View {
         case .downloading(let receivedBytes, let totalBytes):
             let receivedText = NumberFormatter.formatFileSize(receivedBytes)
             if let totalBytes, totalBytes > 0 {
-                return "已下载 \(receivedText) / \(NumberFormatter.formatFileSize(totalBytes))"
+                return "다운로드됨 \(receivedText) / \(NumberFormatter.formatFileSize(totalBytes))"
             }
-            return "已下载 \(receivedText)"
+            return "다운로드됨 \(receivedText)"
         case .unzipping:
-            return "正在处理帧缓存"
+            return "프레임 캐시 처리 중"
         }
     }
 

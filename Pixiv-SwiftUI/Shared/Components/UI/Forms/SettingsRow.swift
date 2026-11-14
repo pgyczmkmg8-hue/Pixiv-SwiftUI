@@ -43,7 +43,7 @@ struct SettingsRow<Content: View>: View {
                     .frame(width: 150)
                 }
 
-                SettingsRow("插画详情画质") {
+                SettingsRow("일러스트 상세 화질") {
                     Picker("", selection: .constant(1)) {
                         Text("中等").tag(0)
                         Text("大图").tag(1)

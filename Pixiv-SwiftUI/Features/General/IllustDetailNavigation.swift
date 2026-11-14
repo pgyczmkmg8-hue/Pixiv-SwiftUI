@@ -646,8 +646,8 @@ struct IllustDetailBrowserView: View {
             panel.canChooseFiles = false
             panel.canCreateDirectories = true
             panel.allowsMultipleSelection = false
-            panel.title = "选择保存目录"
-            panel.prompt = "保存到此目录"
+            panel.title = "저장 폴더 선택"
+            panel.prompt = "이 폴더에 저장"
 
             let result = await withCheckedContinuation { continuation in
                 panel.begin { response in
@@ -663,12 +663,12 @@ struct IllustDetailBrowserView: View {
             if currentDetailViewModel.isUgoira {
                 panel.allowedContentTypes = [.gif]
                 panel.nameFieldStringValue = currentDetailViewModel.saveFilename(quality: 0)
-                panel.title = "保存动图"
+                panel.title = "움직이는 일러스트 저장"
             } else {
                 let quality = userSettingStore.userSetting.downloadQuality
                 panel.allowedContentTypes = currentDetailViewModel.saveAllowedTypes(quality: quality)
                 panel.nameFieldStringValue = currentDetailViewModel.saveFilename(quality: quality)
-                panel.title = "保存插画"
+                panel.title = "일러스트 저장"
             }
 
             let result = await withCheckedContinuation { continuation in

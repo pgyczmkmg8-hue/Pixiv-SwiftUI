@@ -18,7 +18,7 @@ final class WebDAVSyncStore {
     var showError: Bool { error != nil }
     var successMessage = ""
     var showSuccessToast = false
-    var lastOperationDescription = "从未同步"
+    var lastOperationDescription = "동기화한 적 없음"
 
     @ObservationIgnored
     private let service = WebDAVSyncService.shared
@@ -72,7 +72,7 @@ final class WebDAVSyncStore {
             )
             try WebDAVSyncPreferences.saveConfiguration(configuration)
             try WebDAVSyncPreferences.savePassword(password)
-            statusMessage = "已保存 WebDAV 配置"
+            statusMessage = "WebDAV 설정 저장됨"
             showSuccess(message: statusMessage)
         } catch {
             present(error)
@@ -82,7 +82,7 @@ final class WebDAVSyncStore {
     func testConnection() async {
         let generation = authSession.accountGeneration
         let ownerId = authSession.currentUserId
-        await perform("正在测试连接…", generation: generation, ownerId: ownerId) {
+        await perform("연결 테스트 중…", generation: generation, ownerId: ownerId) {
             let credentials = try persistAndBuildCredentials()
             let items = try await service.testConnection(
                 using: credentials,
@@ -90,9 +90,9 @@ final class WebDAVSyncStore {
                 accountGeneration: generation
             )
             if items.isEmpty {
-                statusMessage = "连接成功，远端目录已准备好"
+                statusMessage = "연결 성공, 원격 디렉터리가 준비되었습니다"
             } else {
-                statusMessage = "连接成功，远端已有 \(items.count) 个备份文件"
+                statusMessage = "연결 성공, 원격에 백업 파일이 \(items.count)개 있습니다"
             }
             showSuccess(message: statusMessage)
         }
@@ -101,14 +101,14 @@ final class WebDAVSyncStore {
     func uploadBackup() async {
         let generation = authSession.accountGeneration
         let ownerId = authSession.currentUserId
-        await perform("正在上传备份…", generation: generation, ownerId: ownerId) {
+        await perform("백업 업로드 중…", generation: generation, ownerId: ownerId) {
             let credentials = try persistAndBuildCredentials()
             let manifest = try await service.uploadBackup(
                 using: credentials,
                 ownerId: ownerId,
                 accountGeneration: generation
             )
-            statusMessage = "已上传 \(manifest.datasets.count) 份同步数据"
+            statusMessage = "동기화 데이터 \(manifest.datasets.count)건을 업로드했습니다"
             updateLastOperationDescription()
             showSuccess(message: statusMessage)
         }
@@ -117,14 +117,14 @@ final class WebDAVSyncStore {
     func restoreBackup() async {
         let generation = authSession.accountGeneration
         let ownerId = authSession.currentUserId
-        await perform("正在恢复远端数据…", generation: generation, ownerId: ownerId) {
+        await perform("원격 데이터 복원 중…", generation: generation, ownerId: ownerId) {
             let credentials = try persistAndBuildCredentials()
             let manifest = try await service.restoreBackup(
                 using: credentials,
                 ownerId: ownerId,
                 accountGeneration: generation
             )
-            statusMessage = "已从远端恢复 \(manifest.datasets.count) 份同步数据"
+            statusMessage = "원격에서 동기화 데이터 \(manifest.datasets.count)건을 복원했습니다"
             updateLastOperationDescription()
             showSuccess(message: statusMessage)
         }
@@ -180,13 +180,13 @@ final class WebDAVSyncStore {
         if let operation = WebDAVSyncPreferences.loadLastOperation(ownerId: authSession.currentUserId) {
             let operationText = switch operation.kind {
             case .upload:
-                "最近一次上传"
+                "최근 업로드"
             case .restore:
-                "最近一次恢复"
+                "최근 복원"
             }
             lastOperationDescription = operationText + "：" + operation.date.formatted(date: .abbreviated, time: .shortened)
         } else {
-            lastOperationDescription = "从未同步"
+            lastOperationDescription = "동기화한 적 없음"
         }
     }
 

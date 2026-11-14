@@ -137,7 +137,7 @@ struct TranslatableParagraph: View {
             } catch {
                 await MainActor.run {
                     isTranslating = false
-                    toastMessage = "翻译失败，请检查服务配置"
+                    toastMessage = "번역 실패. 서비스 설정을 확인하세요"
                     showToast = true
                 }
             }

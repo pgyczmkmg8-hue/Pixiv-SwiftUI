@@ -4,7 +4,7 @@ import Kingfisher
 struct GeneralSettingsView: View {
     @Environment(UserSettingStore.self) var userSettingStore
     @Environment(AccountStore.self) var accountStore
-    @State private var cacheSize: String = "计算中..."
+    @State private var cacheSize: String = "계산 중..."
     @State private var showingClearCacheAlert = false
     @State private var isClearingCache = false
     @State private var imageCacheSettings = ImageCacheSettingsStore.shared
@@ -388,7 +388,7 @@ struct GeneralSettingsView: View {
             let size = try await Kingfisher.ImageCache.default.diskStorageSize
             cacheSize = formatSize(Int(size))
         } catch {
-            cacheSize = "获取失败"
+            cacheSize = "가져오지 못했습니다"
         }
     }
 

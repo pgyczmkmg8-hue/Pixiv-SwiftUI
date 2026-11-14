@@ -509,13 +509,13 @@ enum UgoiraError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "无效的 URL"
+            return "잘못된 URL"
         case .downloadFailed:
-            return "下载失败"
+            return "다운로드 실패"
         case .unzipFailed:
-            return "解压失败"
+            return "압축 해제 실패"
         case .frameNotFound:
-            return "帧文件不存在"
+            return "프레임 파일이 없습니다"
         }
     }
 }

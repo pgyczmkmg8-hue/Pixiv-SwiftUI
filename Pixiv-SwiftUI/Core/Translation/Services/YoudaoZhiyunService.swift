@@ -41,7 +41,7 @@ final class YoudaoZhiyunService: BaseTranslateService, TranslateService, @unchec
             return SecretValidationResult(
                 secret: defaultSecret,
                 status: false,
-                info: "未设置密钥。有道智云需要 AppID 和 AppKey，格式为 appid#appKey#vocabId(optional)"
+                info: "키가 설정되지 않았습니다. 유다오 즈윈에는 AppID와 AppKey가 필요하며 형식은 appid#appKey#vocabId(optional)입니다"
             )
         }
 
@@ -49,7 +49,7 @@ final class YoudaoZhiyunService: BaseTranslateService, TranslateService, @unchec
             return SecretValidationResult(
                 secret: secret,
                 status: false,
-                info: "密钥格式错误。应为 appid#appKey#vocabId(optional)，使用 '#' 分隔"
+                info: "키 형식 오류입니다. appid#appKey#vocabId(optional) 형식이어야 하며 '#'으로 구분합니다"
             )
         }
 
@@ -58,7 +58,7 @@ final class YoudaoZhiyunService: BaseTranslateService, TranslateService, @unchec
         return SecretValidationResult(
             secret: secret,
             status: secret != defaultSecret,
-            info: secret == defaultSecret ? "未设置密钥" : partsInfo
+            info: secret == defaultSecret ? "키가 설정되지 않았습니다" : partsInfo
         )
     }
 
@@ -78,7 +78,7 @@ final class YoudaoZhiyunService: BaseTranslateService, TranslateService, @unchec
             if let secret = task.secret {
                 guard let parsedConfig = YoudaoZhiyunConfig.parse(from: secret) else {
                     throw TranslateError.invalidSecretFormat(
-                        "有道智云密钥格式应为 appid#appKey#vocabId(optional)，使用 '#' 分隔"
+                        "유다오 즈윈 키 형식은 appid#appKey#vocabId(optional)이어야 하며 '#'으로 구분합니다"
                     )
                 }
                 return try await translateWithConfig(parsedConfig, task: &task)
@@ -133,7 +133,7 @@ final class YoudaoZhiyunService: BaseTranslateService, TranslateService, @unchec
 
         let errorCode = Int(responseObj.errorCode) ?? 0
         guard errorCode == 0 else {
-            throw TranslateError.apiError("有道智云错误 \(errorCode)")
+            throw TranslateError.apiError("유다오 즈윈 오류 \(errorCode)")
         }
 
         guard let translations = responseObj.translation, !translations.isEmpty else {

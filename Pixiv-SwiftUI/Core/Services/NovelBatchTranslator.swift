@@ -8,11 +8,11 @@ enum NovelBatchTranslationError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidPayload:
-            return "无法构建批量翻译请求"
+            return "일괄 번역 요청을 만들 수 없습니다"
         case .invalidResponse:
-            return "批量翻译返回格式错误"
+            return "일괄 번역 응답 형식 오류"
         case .emptyTranslation:
-            return "批量翻译未返回有效结果"
+            return "일괄 번역에서 유효한 결과가 반환되지 않았습니다"
         }
     }
 }

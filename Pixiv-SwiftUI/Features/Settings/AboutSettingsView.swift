@@ -69,7 +69,7 @@ struct AboutSettingsView: View {
             }
         } message: {
             if let info = updateInfo {
-                Text("版本 \(info.version)\n\n\(info.releaseNotes)")
+                Text("버전 \(info.version)\n\n\(info.releaseNotes)")
             }
         }
         .alert("已是最新版本", isPresented: $showingNoUpdateAlert) {
@@ -217,7 +217,7 @@ struct AboutSettingsView: View {
                         showingNoUpdateAlert = true
                     }
                 } else {
-                    checkError = "检查更新失败"
+                    checkError = "업데이트 확인 실패"
                 }
             }
         }

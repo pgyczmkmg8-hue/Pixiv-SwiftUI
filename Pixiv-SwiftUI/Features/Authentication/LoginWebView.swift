@@ -96,13 +96,13 @@ struct LoginWebView: Representable {
             if isCustomCallback || isHTTPSCallback {
                 guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
                     decisionHandler(.cancel)
-                    self.reportError(AppError.authenticationError("登录回调地址无效"))
+                    self.reportError(AppError.authenticationError("로그인 콜백 주소가 잘못되었습니다"))
                     return
                 }
 
                 if let error = components.queryItems?.first(where: { $0.name == "error" })?.value {
                     decisionHandler(.cancel)
-                    self.reportError(AppError.authenticationError("网页登录失败：" + error))
+                    self.reportError(AppError.authenticationError("웹 로그인 실패: " + error))
                     return
                 }
 
@@ -122,7 +122,7 @@ struct LoginWebView: Representable {
                 }
 
                 decisionHandler(.cancel)
-                self.reportError(AppError.authenticationError("登录回调缺少授权 code"))
+                self.reportError(AppError.authenticationError("로그인 콜백에 인증 code가 없습니다"))
                 return
             }
 

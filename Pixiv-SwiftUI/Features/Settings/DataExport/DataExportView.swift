@@ -218,11 +218,11 @@ struct ExportItemRow: View {
     private func description(for type: ExportItemType) -> String {
         switch type {
         case .searchHistory:
-            return "导出/导入搜索历史记录"
+            return "검색 기록 내보내기/가져오기"
         case .glanceHistory:
-            return "导出/导入插画和小说浏览历史"
+            return "일러스트 및 소설 열람 기록 내보내기/가져오기"
         case .muteData:
-            return "导出/导入屏蔽的标签、用户和作品"
+            return "차단한 태그, 사용자, 작품 내보내기/가져오기"
         }
     }
 

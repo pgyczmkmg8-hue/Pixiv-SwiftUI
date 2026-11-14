@@ -92,7 +92,7 @@ final class AccountStore: AuthSessionProtocol {
             updateCurrentAccountFromAccounts()
             self.isLoaded = true
         } catch {
-            self.error = AppError.databaseError("无法加载账户: \(error)")
+            self.error = AppError.databaseError("계정을 불러올 수 없습니다: \(error)")
             self.isLoaded = true
         }
     }
@@ -112,7 +112,7 @@ final class AccountStore: AuthSessionProtocol {
             }
         } catch {
             await MainActor.run {
-                self.error = AppError.databaseError("无法加载账户: \(error)")
+                self.error = AppError.databaseError("계정을 불러올 수 없습니다: \(error)")
                 self.isLoaded = true
             }
         }
@@ -291,7 +291,7 @@ final class AccountStore: AuthSessionProtocol {
             try await saveAccount(account, expiresIn: expiresIn)
             isLoading = false
         } catch {
-            self.error = AppError.networkError("登录失败: \(error.localizedDescription)")
+            self.error = AppError.networkError("로그인 실패: \(error.localizedDescription)")
             isLoading = false
         }
     }
@@ -315,7 +315,7 @@ final class AccountStore: AuthSessionProtocol {
             try await saveAccount(account, expiresIn: expiresIn)
             isLoading = false
         } catch {
-            self.error = AppError.networkError("登录失败: \(error.localizedDescription)")
+            self.error = AppError.networkError("로그인 실패: \(error.localizedDescription)")
             isLoading = false
         }
     }
@@ -327,7 +327,7 @@ final class AccountStore: AuthSessionProtocol {
 
         // 保存到 Keychain
         guard saveTokensToKeychain(for: account, expiresIn: expiresIn) else {
-            throw AppError.databaseError("无法将登录凭证保存到钥匙串，请检查系统钥匙串权限后重试")
+            throw AppError.databaseError("로그인 자격 증명을 키체인에 저장할 수 없습니다. 시스템 키체인 권한을 확인한 뒤 다시 시도하세요")
         }
 
         // 检查是否已存在
@@ -408,7 +408,7 @@ final class AccountStore: AuthSessionProtocol {
             try context.save()
             // 同步保存到 Keychain，确保下次启动时加载的是最新 token
             guard saveTokensToKeychain(for: existing, expiresIn: expiresIn) else {
-                throw AppError.databaseError("无法更新钥匙串中的登录凭证")
+                throw AppError.databaseError("키체인의 로그인 자격 증명을 업데이트할 수 없습니다")
             }
         }
     }
@@ -491,7 +491,7 @@ final class AccountStore: AuthSessionProtocol {
         do {
             try dataContainer.save()
         } catch {
-            self.error = AppError.databaseError("无法保存 Ajax 会话: \(error)")
+            self.error = AppError.databaseError("Ajax 세션을 저장할 수 없습니다: \(error)")
         }
 
         // 同步保存 PHPSESSID 到 Keychain，确保下次启动时能恢复

@@ -34,7 +34,7 @@ struct MainSplitView: View {
 
                     sidebarRow(for: .search)
 
-                    sidebarHeader("资料库", topPadding: 24)
+                    sidebarHeader("라이브러리", topPadding: 24)
                     ForEach(NavigationItem.secondaryItems) { item in
                         sidebarRow(for: item)
                     }

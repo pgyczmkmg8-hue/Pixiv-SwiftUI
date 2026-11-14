@@ -33,7 +33,7 @@ final class DeepLTranslateService: BaseTranslateService, TranslateService, @unch
             return SecretValidationResult(
                 secret: defaultSecret,
                 status: false,
-                info: "未设置密钥。DeepL 需要 API Key，格式为 apiKey#glossaryId(optional)"
+                info: "키가 설정되지 않았습니다. DeepL에는 API Key가 필요하며 형식은 apiKey#glossaryId(optional)입니다"
             )
         }
 
@@ -41,7 +41,7 @@ final class DeepLTranslateService: BaseTranslateService, TranslateService, @unch
             return SecretValidationResult(
                 secret: secret,
                 status: false,
-                info: "密钥格式错误。应为 apiKey#glossaryId(optional)，使用 '#' 分隔"
+                info: "키 형식 오류입니다. apiKey#glossaryId(optional) 형식이어야 하며 '#'으로 구분합니다"
             )
         }
 
@@ -49,7 +49,7 @@ final class DeepLTranslateService: BaseTranslateService, TranslateService, @unch
             return SecretValidationResult(
                 secret: secret,
                 status: false,
-                info: "API Key 长度必须 >= 36，当前长度：\(config.apiKey.count)"
+                info: "API Key 길이는 36 이상이어야 합니다. 현재 길이: \(config.apiKey.count)"
             )
         }
 
@@ -79,7 +79,7 @@ final class DeepLTranslateService: BaseTranslateService, TranslateService, @unch
             if let secret = task.secret {
                 guard let parsedConfig = DeepLConfig.parse(from: secret) else {
                     throw TranslateError.invalidSecretFormat(
-                        "DeepL 密钥格式应为 apiKey#glossaryId(optional)，使用 '#' 分隔"
+                        "DeepL 키 형식은 apiKey#glossaryId(optional)이어야 하며 '#'으로 구분합니다"
                     )
                 }
                 return try await translateWithConfig(parsedConfig, task: &task)

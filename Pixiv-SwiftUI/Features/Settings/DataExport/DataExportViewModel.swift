@@ -18,7 +18,7 @@ enum ExportItemType: String, CaseIterable, Identifiable {
         case .glanceHistory:
             return "浏览历史"
         case .muteData:
-            return "屏蔽数据"
+            return "차단 데이터"
         }
     }
 
@@ -105,7 +105,7 @@ final class DataExportViewModel {
                 try await exportService.importMuteData(from: url, strategy: strategy)
             }
 
-            toastMessage = "导入成功"
+            toastMessage = "가져오기 성공"
             showToast = true
         } catch let error as DataExportError {
             if case .cancelled = error {

@@ -366,29 +366,29 @@ enum WebDAVSyncError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .accountChanged:
-            return "登录账号已切换，本次同步已取消"
+            return "로그인 계정이 바뀌어 이번 동기화가 취소되었습니다"
         case .invalidServerURL:
-            return "请输入有效的 WebDAV 地址"
+            return "올바른 WebDAV 주소를 입력하세요"
         case .emptyUsername:
-            return "请输入 WebDAV 用户名"
+            return "WebDAV 사용자 이름을 입력하세요"
         case .emptyPassword:
-            return "请输入 WebDAV 密码或应用专用密码"
+            return "WebDAV 비밀번호 또는 앱 전용 비밀번호를 입력하세요"
         case .invalidResponse:
-            return "WebDAV 服务返回了无效响应"
+            return "WebDAV 서비스가 잘못된 응답을 반환했습니다"
         case .authenticationFailed:
-            return "WebDAV 认证失败，请检查用户名或密码"
+            return "WebDAV 인증에 실패했습니다. 사용자 이름이나 비밀번호를 확인하세요"
         case .httpStatus(let statusCode):
-            return "WebDAV 请求失败（HTTP \(statusCode)）"
+            return "WebDAV 요청 실패 (HTTP \(statusCode))"
         case .remoteFileNotFound(let fileName):
-            return "远端缺少文件：\(fileName)"
+            return "원격에 파일이 없습니다: \(fileName)"
         case .invalidManifest:
-            return "远端备份清单无效或版本不受支持"
+            return "원격 백업 목록이 잘못되었거나 지원하지 않는 버전입니다"
         case .payloadIntegrityMismatch(let fileName):
-            return "远端文件校验失败：\(fileName)"
+            return "원격 파일 검증 실패: \(fileName)"
         case .xmlParsingFailed:
-            return "无法解析 WebDAV 响应"
+            return "WebDAV 응답을 파싱할 수 없습니다"
         case .fileOperationFailed(let message):
-            return "文件操作失败：\(message)"
+            return "파일 작업 실패: \(message)"
         }
     }
 }

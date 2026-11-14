@@ -13,15 +13,15 @@ enum DataExportError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidFormat:
-            return "无效的数据格式"
+            return "잘못된 데이터 형식"
         case .parseError(let msg):
-            return "解析失败: \(msg)"
+            return "파싱 실패: \(msg)"
         case .fileOperationFailed(let msg):
-            return "文件操作失败: \(msg)"
+            return "파일 작업 실패: \(msg)"
         case .noData:
-            return "没有可导出的数据"
+            return "내보낼 데이터가 없습니다"
         case .cancelled:
-            return "操作已取消"
+            return "작업이 취소되었습니다"
         }
     }
 }
@@ -178,7 +178,7 @@ final class DataExportService {
             exportData = wrapper.data
         case .flutterSearchHistory:
             guard let parsed = FlutterCompat.parseFlutterSearchHistory(from: json) else {
-                throw DataExportError.parseError("无法解析搜索历史数据")
+                throw DataExportError.parseError("검색 기록 데이터를 파싱할 수 없습니다")
             }
             exportData = parsed
         default:
@@ -211,7 +211,7 @@ final class DataExportService {
             exportData = wrapper.data
         case .flutterGlanceHistory:
             guard let parsed = FlutterCompat.parseFlutterGlanceHistory(from: json) else {
-                throw DataExportError.parseError("无法解析浏览历史数据")
+                throw DataExportError.parseError("열람 기록 데이터를 파싱할 수 없습니다")
             }
             exportData = parsed
         default:
@@ -244,7 +244,7 @@ final class DataExportService {
             exportData = wrapper.data
         case .flutterMuteData:
             guard let parsed = FlutterCompat.parseFlutterMuteData(from: json) else {
-                throw DataExportError.parseError("无法解析屏蔽数据")
+                throw DataExportError.parseError("차단 데이터를 파싱할 수 없습니다")
             }
             exportData = parsed
         default:

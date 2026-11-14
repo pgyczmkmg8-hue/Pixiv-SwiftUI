@@ -136,17 +136,17 @@ enum GIFExportError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .frameCountMismatch:
-            return "帧数量不匹配"
+            return "프레임 수가 일치하지 않습니다"
         case .noFrames:
-            return "没有可导出的帧"
+            return "내보낼 프레임이 없습니다"
         case .creationFailed:
-            return "GIF 创建失败"
+            return "GIF 생성 실패"
         case .finalizationFailed:
-            return "GIF 生成失败"
+            return "GIF 생성 실패"
         case .imageLoadFailed:
-            return "图片加载失败"
+            return "이미지 로드 실패"
         case .allFramesFailed:
-            return "所有帧处理失败"
+            return "모든 프레임 처리 실패"
         }
     }
 }

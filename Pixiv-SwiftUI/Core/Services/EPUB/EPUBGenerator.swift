@@ -77,7 +77,7 @@ struct EPUBGenerator {
         do {
             archive = try Archive(url: archiveURL, accessMode: .create)
         } catch {
-            throw NovelExportError.writeFailed("无法创建 ZIP 归档: \(error.localizedDescription)")
+            throw NovelExportError.writeFailed("ZIP 아카이브를 만들 수 없습니다: \(error.localizedDescription)")
         }
 
         // 必须先添加 mimetype (未压缩)

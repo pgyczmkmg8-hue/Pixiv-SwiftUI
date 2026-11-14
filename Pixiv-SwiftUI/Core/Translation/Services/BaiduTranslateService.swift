@@ -39,7 +39,7 @@ final class BaiduTranslateService: BaseTranslateService, TranslateService, @unch
             return SecretValidationResult(
                 secret: defaultSecret,
                 status: false,
-                info: "未设置密钥。百度翻译需要 AppID 和 Key，格式为 AppID#Key"
+                info: "키가 설정되지 않았습니다. 바이두 번역에는 AppID와 Key가 필요하며 형식은 AppID#Key입니다"
             )
         }
 
@@ -47,7 +47,7 @@ final class BaiduTranslateService: BaseTranslateService, TranslateService, @unch
             return SecretValidationResult(
                 secret: secret,
                 status: false,
-                info: "密钥格式错误。应为 AppID#Key#Action(optional)，使用 '#' 分隔"
+                info: "키 형식 오류입니다. AppID#Key#Action(optional) 형식이어야 하며 '#'으로 구분합니다"
             )
         }
 
@@ -74,7 +74,7 @@ final class BaiduTranslateService: BaseTranslateService, TranslateService, @unch
             if let secret = task.secret {
                 guard let parsedConfig = BaiduTranslateConfig.parse(from: secret) else {
                     throw TranslateError.invalidSecretFormat(
-                        "百度翻译密钥格式应为 AppID#Key#Action(optional)，使用 '#' 分隔"
+                        "바이두 번역 키 형식은 AppID#Key#Action(optional)이어야 하며 '#'으로 구분합니다"
                     )
                 }
                 return try await translateWithConfig(parsedConfig, task: &task)

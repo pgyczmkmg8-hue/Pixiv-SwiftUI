@@ -21,7 +21,7 @@ enum DownloadError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .ugoiraLoadFailed:
-            return "动图加载失败"
+            return "움직이는 일러스트 로드 실패"
         }
     }
 }
@@ -204,11 +204,11 @@ struct DownloadTask: Identifiable, Codable, Sendable {
         switch status {
         case .downloading:
             if contentType == .ugoira {
-                return "处理中 - \(Int(progress * 100))%"
+                return "처리 중 - \(Int(progress * 100))%"
             } else if contentType == .novel {
-                return "导出中 - \(Int(progress * 100))%"
+                return "내보내는 중 - \(Int(progress * 100))%"
             } else if contentType == .novelSeries {
-                return "导出中 \(currentPage)/\(pageCount) - \(Int(progress * 100))%"
+                return "내보내는 중 \(currentPage)/\(pageCount) - \(Int(progress * 100))%"
             } else {
                 return "\(currentPage)/\(pageCount) - \(Int(progress * 100))%"
             }

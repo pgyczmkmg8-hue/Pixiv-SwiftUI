@@ -275,9 +275,9 @@ enum ImageTranslationError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "无效的图片 URL"
+            return "잘못된 이미지 URL"
         case .imageConversionFailed:
-            return "图片格式转换失败"
+            return "이미지 형식 변환 실패"
         }
     }
 }

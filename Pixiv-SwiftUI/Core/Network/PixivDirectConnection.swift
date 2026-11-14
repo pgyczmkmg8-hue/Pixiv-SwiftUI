@@ -34,19 +34,19 @@ nonisolated enum PixivDirectConnectionError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unsupportedHost:
-            return "不支持的 HTTP/3 直连域名"
+            return "지원하지 않는 HTTP/3 직접 연결 도메인"
         case .invalidRequest:
-            return "无效的 HTTP/3 直连请求"
+            return "잘못된 HTTP/3 직접 연결 요청"
         case .invalidResponse:
-            return "无效的 HTTP/3 直连响应"
+            return "잘못된 HTTP/3 직접 연결 응답"
         case .incompleteResponse:
-            return "HTTP/3 直连响应不完整"
+            return "HTTP/3 직접 연결 응답이 불완전합니다"
         case .responseTooLarge:
-            return "HTTP/3 直连响应过大"
+            return "HTTP/3 직접 연결 응답이 너무 큽니다"
         case .requestTooLarge:
-            return "HTTP/3 直连请求过大"
+            return "HTTP/3 직접 연결 요청이 너무 큽니다"
         case .timedOut:
-            return "HTTP/3 直连请求超时"
+            return "HTTP/3 직접 연결 요청 시간 초과"
         case .frameUnexpected:
             return "Unexpected HTTP/3 frame sequence"
         case .closedCriticalStream:
@@ -82,7 +82,7 @@ nonisolated enum PixivDirectConnectionError: LocalizedError {
         case let .transportFailure(message, _):
             return message
         case .allEndpointsFailed:
-            return "所有 HTTP/3 直连节点均失败"
+            return "모든 HTTP/3 직접 연결 노드가 실패했습니다"
         }
     }
 

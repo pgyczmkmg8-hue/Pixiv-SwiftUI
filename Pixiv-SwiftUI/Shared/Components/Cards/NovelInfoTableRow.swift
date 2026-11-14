@@ -34,7 +34,7 @@ struct NovelInfoTableRow: View {
     }
 
     private var metricsSummary: String {
-        "\(formatTextLength(novel.textLength)) / \(NumberFormatter.formatCount(novel.totalBookmarks))收藏 / \(NumberFormatter.formatCount(novel.totalView))阅读"
+        "\(formatTextLength(novel.textLength)) / \(NumberFormatter.formatCount(novel.totalBookmarks))북마크 / \(NumberFormatter.formatCount(novel.totalView))조회"
     }
 
     var body: some View {
@@ -142,10 +142,10 @@ struct NovelInfoTableRow: View {
 
     private func formatTextLength(_ length: Int) -> String {
         if length >= 10000 {
-            return String(format: "%.1f万字", Double(length) / 10000)
+            return String(format: "%.1f만 자", Double(length) / 10000)
         } else if length >= 1000 {
-            return String(format: "%.1f千字", Double(length) / 1000)
+            return String(format: "%.1f천 자", Double(length) / 1000)
         }
-        return "\(length)字"
+        return "\(length)자"
     }
 }

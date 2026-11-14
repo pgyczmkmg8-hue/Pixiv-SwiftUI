@@ -94,7 +94,7 @@ struct PrivacySettingsView: View {
         } header: {
             Text(String(localized: "内容过滤"))
         } footer: {
-            Text(verbatim: "设置如何显示 R18、R18G、剧透内容和 AI 生成的作品")
+            Text(verbatim: "R18, R18G, 스포일러 콘텐츠와 AI 생성 작품을 어떻게 표시할지 설정합니다")
         }
     }
 
