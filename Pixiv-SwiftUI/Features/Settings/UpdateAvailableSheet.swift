@@ -62,7 +62,7 @@ struct UpdateAvailableSheet: View {
                 } label: {
                     Text(canInstallWithFeather ? "Feather로 설치" : "릴리즈 보기")
                         .lineLimit(1)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, minHeight: 52)
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
@@ -74,9 +74,10 @@ struct UpdateAvailableSheet: View {
                         Text("닫기")
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
-                            .frame(maxWidth: .infinity)
+                            .frame(maxWidth: .infinity, minHeight: 52)
                     }
                     .buttonStyle(.bordered)
+                    .controlSize(.large)
 
                     Button {
                         onSkip()
@@ -85,9 +86,10 @@ struct UpdateAvailableSheet: View {
                         Text("이 버전 건너뛰기")
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
-                            .frame(maxWidth: .infinity)
+                            .frame(maxWidth: .infinity, minHeight: 52)
                     }
                     .buttonStyle(.bordered)
+                    .controlSize(.large)
                 }
             }
         }
