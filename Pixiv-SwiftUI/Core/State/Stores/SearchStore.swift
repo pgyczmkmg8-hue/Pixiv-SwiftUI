@@ -15,6 +15,7 @@ class SearchStore {
     }
     var searchHistory: [SearchTag] = []
     var suggestions: [UnifiedSearchSuggestion] = []
+    var suppressSubmitUntil: Date = .distantPast
     var trendTags: [TrendTag] = []
     var isLoadingTrendTags: Bool = false
     var recommendedSearchTags: [TrendTag] = []

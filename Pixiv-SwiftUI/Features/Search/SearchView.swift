@@ -228,6 +228,10 @@ struct SearchView: View {
 
     private func submitSearch() {
         guard accountStore.isLoggedIn else { return }
+        if Date() < store.suppressSubmitUntil {
+            store.suppressSubmitUntil = .distantPast
+            return
+        }
         let submittedText = store.searchText
         guard !submittedText.isEmpty else { return }
 

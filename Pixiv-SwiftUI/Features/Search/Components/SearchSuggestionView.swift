@@ -59,53 +59,10 @@ struct SearchSuggestionView: View {
             if !store.suggestions.isEmpty {
                 Section("标签建议") {
                     ForEach(store.suggestions) { tag in
-                        Button {
-                            store.searchText = completedSearchText(with: tag.tagName)
-                        } label: {
-                        HStack {
-                            Image(systemName: tag.isLocalMatch ? "checkmark.circle" : "magnifyingglass")
-                                .foregroundColor(tag.isLocalMatch ? .accentColor : .secondary)
-                                .font(.system(size: 14))
-
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(tag.tagName)
-                                    .foregroundColor(.primary)
-                                if let translated = tag.displayTranslation {
-                                    Text(translated)
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-
-                            Spacer()
-
-                            #if os(macOS)
-                            // macOS 特有的补全图标
-                            Image(systemName: "arrow.up.left")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            #endif
-                        }
-                    }
-                    .contextMenu {
-                        Button {
-                            copyToClipboard(tag.tagName)
-                        } label: {
-                            Label("复制 tag", systemImage: "doc.on.doc")
-                        }
-
-                        if accountStore.isLoggedIn {
-                            Button {
-                                triggerHaptic()
-                                addBlockedTag(tag.tagName, tag.displayTranslation)
-                            } label: {
-                                Label("屏蔽 tag", systemImage: "eye.slash")
-                            }
-                        }
+                        suggestionRow(tag)
                     }
                 }
             }
-        }
 
         // 增加底部留白，防止 iOS 键盘及输入框遮挡
             #if os(iOS)
@@ -117,6 +74,59 @@ struct SearchSuggestionView: View {
                 }
             }
             #endif
+        }
+    }
+
+    @ViewBuilder
+    private func suggestionLabel(_ tag: UnifiedSearchSuggestion) -> some View {
+        HStack {
+            Image(systemName: tag.isLocalMatch ? "checkmark.circle" : "magnifyingglass")
+                .foregroundColor(tag.isLocalMatch ? .accentColor : .secondary)
+                .font(.system(size: 14))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(tag.tagName)
+                    .foregroundColor(.primary)
+                if let translated = tag.displayTranslation {
+                    Text(translated)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            Spacer()
+
+            #if os(macOS)
+            Image(systemName: "arrow.up.left")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            #endif
+        }
+    }
+
+    @ViewBuilder
+    private func suggestionRow(_ tag: UnifiedSearchSuggestion) -> some View {
+        Button {
+            store.searchText = completedSearchText(with: tag.tagName)
+            store.suppressSubmitUntil = Date().addingTimeInterval(0.8)
+        } label: {
+            suggestionLabel(tag)
+        }
+        .contextMenu {
+            Button {
+                copyToClipboard(tag.tagName)
+            } label: {
+                Label("复制 tag", systemImage: "doc.on.doc")
+            }
+
+            if accountStore.isLoggedIn {
+                Button {
+                    triggerHaptic()
+                    addBlockedTag(tag.tagName, tag.displayTranslation)
+                } label: {
+                    Label("屏蔽 tag", systemImage: "eye.slash")
+                }
+            }
         }
     }
 
