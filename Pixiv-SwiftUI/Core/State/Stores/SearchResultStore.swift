@@ -632,6 +632,38 @@ final class SearchResultStore {
                     startDate: startDate,
                     endDate: endDate
                 )
+            } else if usesPseudoPopularSort {
+                let nextTargetCount = max(novelPseudoPopularTargetCount, novelResults.count) + novelLimit
+                let nextSamplePageCount = max(
+                    novelPseudoPopularSamplePageCount + 1,
+                    pseudoPopularBackgroundSamplePageCount
+                )
+                let batch = try await searchNovelsByBookmarkCount(
+                    word: baseWord,
+                    showsAIGenerated: showsAIGenerated,
+                    searchTarget: searchTarget,
+                    startDate: startDate,
+                    endDate: endDate,
+                    targetCount: nextTargetCount,
+                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
+                    samplePageCount: nextSamplePageCount
+                )
+                guard isActiveSearchSession(searchSessionID) else { return }
+                self.novelResults = appendNewResultsPreservingOrder(existing: self.novelResults, fetched: batch.items)
+                self.novelPseudoPopularTargetCount = nextTargetCount
+                self.novelPseudoPopularSamplePageCount = nextSamplePageCount
+                self.novelOffset = batch.nextOffset
+                self.novelHasMore = batch.hasMore
+                scheduleNovelPseudoPopularEnrichment(
+                    sessionID: novelPseudoPopularSessionID,
+                    word: baseWord,
+                    showsAIGenerated: showsAIGenerated,
+                    bookmarkFilter: bookmarkFilter,
+                    searchTarget: searchTarget,
+                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
+                    startDate: startDate,
+                    endDate: endDate
+                )
             } else {
                 guard let nextURL = self.novelNextURL else {
                     self.novelHasMore = false
