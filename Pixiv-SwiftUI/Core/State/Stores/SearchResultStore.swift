@@ -89,6 +89,7 @@ final class SearchResultStore {
     @ObservationIgnored var novelPseudoPopularEnrichmentTask: Task<Void, Never>?
     @ObservationIgnored var illustPseudoPopularPreloadTask: Task<Void, Never>?
     @ObservationIgnored var novelPseudoPopularPreloadTask: Task<Void, Never>?
+    @ObservationIgnored var popularIllustSearcher: PopularIllustSearcher?
     @ObservationIgnored var supplementalSearchTask: Task<Void, Never>?
     @ObservationIgnored var illustPseudoPopularSession: IllustPseudoPopularSessionState?
     @ObservationIgnored var novelPseudoPopularSession: NovelPseudoPopularSessionState?
@@ -143,6 +144,7 @@ final class SearchResultStore {
         self.illustPseudoPopularSessionID = UUID()
         self.novelPseudoPopularSessionID = UUID()
         self.novelSearchSignature = nil
+        self.popularIllustSearcher = nil
         cancelIllustPseudoPopularEnrichment()
         cancelNovelPseudoPopularEnrichment()
         cancelIllustPseudoPopularPreload()
@@ -201,39 +203,19 @@ final class SearchResultStore {
         do {
             let fetchedIllusts: [Illusts]
 
-            if usesUsersTagPseudoPopularSort {
-                let illustBatch = try await searchIllustsByPseudoPopularTags(
+            if usesPseudoPopularSort {
+                let searcher = PopularIllustSearcher(config: PopularIllustSearcher.Configuration(
                     word: baseWord,
-                    showsAIGenerated: showsAIGenerated,
-                    bookmarkFilter: bookmarkFilter,
                     searchTarget: searchTarget,
-                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
-                    startDate: startDate,
-                    endDate: endDate,
-                    targetCount: illustInitialTargetCount,
-                    samplePageCount: pseudoPopularInitialSamplePageCount
-                )
-                fetchedIllusts = illustBatch.items
-                self.illustPseudoPopularTargetCount = illustInitialTargetCount
-                self.illustPseudoPopularSamplePageCount = pseudoPopularInitialSamplePageCount
-                self.illustOffset = illustBatch.nextOffset
-                self.illustHasMore = illustBatch.hasMore
-            } else if usesPseudoPopularSort {
-                let illustBatch = try await searchIllustsByBookmarkCount(
-                    word: baseWord,
                     showsAIGenerated: showsAIGenerated,
-                    searchTarget: searchTarget,
+                    minimumBookmarkCount: max(bookmarkFilter.rawValue, 100),
                     startDate: startDate,
-                    endDate: endDate,
-                    targetCount: illustInitialTargetCount,
-                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
-                    samplePageCount: pseudoPopularInitialSamplePageCount
-                )
-                fetchedIllusts = illustBatch.items
-                self.illustPseudoPopularTargetCount = illustInitialTargetCount
-                self.illustPseudoPopularSamplePageCount = pseudoPopularInitialSamplePageCount
-                self.illustOffset = illustBatch.nextOffset
-                self.illustHasMore = illustBatch.hasMore
+                    endDate: endDate
+                ))
+                let batch = try await searcher.nextBatch(minimumItems: illustLimit)
+                popularIllustSearcher = searcher
+                fetchedIllusts = batch.items
+                self.illustHasMore = batch.hasMore
             } else {
                 let response = try await api.searchAPI.searchIllustsPage(
                     word: finalWord,
@@ -284,16 +266,6 @@ final class SearchResultStore {
                 self.userResults = []
                 self.novelResults = []
                 self.isLoading = false
-                scheduleIllustPseudoPopularEnrichment(
-                    sessionID: illustSessionID,
-                    word: baseWord,
-                    showsAIGenerated: showsAIGenerated,
-                    bookmarkFilter: bookmarkFilter,
-                    searchTarget: searchTarget,
-                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
-                    startDate: startDate,
-                    endDate: endDate
-                )
                 scheduleSupplementalSearch(
                     sessionID: searchSessionID,
                     context: SearchExecutionContext(
@@ -384,71 +356,11 @@ final class SearchResultStore {
         )
         cancelIllustPseudoPopularEnrichment()
         do {
-            if usesUsersTagPseudoPopularSort {
-                let nextTargetCount = max(illustPseudoPopularTargetCount, illustResults.count) + illustLimit
-                let nextSamplePageCount = max(
-                    illustPseudoPopularSamplePageCount + 1,
-                    pseudoPopularBackgroundSamplePageCount
-                )
-                let batch = try await searchIllustsByPseudoPopularTags(
-                    word: baseWord,
-                    showsAIGenerated: showsAIGenerated,
-                    bookmarkFilter: bookmarkFilter,
-                    searchTarget: searchTarget,
-                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
-                    startDate: startDate,
-                    endDate: endDate,
-                    targetCount: nextTargetCount,
-                    samplePageCount: nextSamplePageCount
-                )
+            if usesPseudoPopularSort, let searcher = popularIllustSearcher {
+                let batch = try await searcher.nextBatch(minimumItems: illustLimit)
                 guard isActiveSearchSession(searchSessionID) else { return }
                 self.illustResults = appendNewResultsPreservingOrder(existing: self.illustResults, fetched: batch.items)
-                self.illustPseudoPopularTargetCount = nextTargetCount
-                self.illustPseudoPopularSamplePageCount = nextSamplePageCount
-                self.illustOffset = batch.nextOffset
                 self.illustHasMore = batch.hasMore
-                scheduleIllustPseudoPopularEnrichment(
-                    sessionID: illustPseudoPopularSessionID,
-                    word: baseWord,
-                    showsAIGenerated: showsAIGenerated,
-                    bookmarkFilter: bookmarkFilter,
-                    searchTarget: searchTarget,
-                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
-                    startDate: startDate,
-                    endDate: endDate
-                )
-            } else if usesPseudoPopularSort {
-                let nextTargetCount = max(illustPseudoPopularTargetCount, illustResults.count) + illustLimit
-                let nextSamplePageCount = max(
-                    illustPseudoPopularSamplePageCount + 1,
-                    pseudoPopularBackgroundSamplePageCount
-                )
-                let batch = try await searchIllustsByBookmarkCount(
-                    word: baseWord,
-                    showsAIGenerated: showsAIGenerated,
-                    searchTarget: searchTarget,
-                    startDate: startDate,
-                    endDate: endDate,
-                    targetCount: nextTargetCount,
-                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
-                    samplePageCount: nextSamplePageCount
-                )
-                guard isActiveSearchSession(searchSessionID) else { return }
-                self.illustResults = appendNewResultsPreservingOrder(existing: self.illustResults, fetched: batch.items)
-                self.illustPseudoPopularTargetCount = nextTargetCount
-                self.illustPseudoPopularSamplePageCount = nextSamplePageCount
-                self.illustOffset = batch.nextOffset
-                self.illustHasMore = batch.hasMore
-                scheduleIllustPseudoPopularEnrichment(
-                    sessionID: illustPseudoPopularSessionID,
-                    word: baseWord,
-                    showsAIGenerated: showsAIGenerated,
-                    bookmarkFilter: bookmarkFilter,
-                    searchTarget: searchTarget,
-                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
-                    startDate: startDate,
-                    endDate: endDate
-                )
             } else {
                 guard let nextURL = self.illustNextURL else {
                     self.illustHasMore = false
@@ -702,38 +614,6 @@ final class SearchResultStore {
                     startDate: startDate,
                     endDate: endDate,
                     targetCount: nextTargetCount,
-                    samplePageCount: nextSamplePageCount
-                )
-                guard isActiveSearchSession(searchSessionID) else { return }
-                self.novelResults = appendNewResultsPreservingOrder(existing: self.novelResults, fetched: batch.items)
-                self.novelPseudoPopularTargetCount = nextTargetCount
-                self.novelPseudoPopularSamplePageCount = nextSamplePageCount
-                self.novelOffset = batch.nextOffset
-                self.novelHasMore = batch.hasMore
-                scheduleNovelPseudoPopularEnrichment(
-                    sessionID: novelPseudoPopularSessionID,
-                    word: baseWord,
-                    showsAIGenerated: showsAIGenerated,
-                    bookmarkFilter: bookmarkFilter,
-                    searchTarget: searchTarget,
-                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
-                    startDate: startDate,
-                    endDate: endDate
-                )
-            } else if usesPseudoPopularSort {
-                let nextTargetCount = max(novelPseudoPopularTargetCount, novelResults.count) + novelLimit
-                let nextSamplePageCount = max(
-                    novelPseudoPopularSamplePageCount + 1,
-                    pseudoPopularBackgroundSamplePageCount
-                )
-                let batch = try await searchNovelsByBookmarkCount(
-                    word: baseWord,
-                    showsAIGenerated: showsAIGenerated,
-                    searchTarget: searchTarget,
-                    startDate: startDate,
-                    endDate: endDate,
-                    targetCount: nextTargetCount,
-                    minimumBookmarkCount: pseudoPopularMinimumBookmarkCount,
                     samplePageCount: nextSamplePageCount
                 )
                 guard isActiveSearchSession(searchSessionID) else { return }
