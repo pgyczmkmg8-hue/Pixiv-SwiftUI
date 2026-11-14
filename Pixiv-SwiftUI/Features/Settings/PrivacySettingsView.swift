@@ -2,6 +2,10 @@ import SwiftUI
 
 struct PrivacySettingsView: View {
     @Environment(UserSettingStore.self) var userSettingStore
+    #if os(iOS)
+    @State private var appLock = AppLockManager.shared
+    @State private var appLockError: String?
+    #endif
 
     var body: some View {
         Form {
@@ -9,10 +13,21 @@ struct PrivacySettingsView: View {
             rankingFilterSection
             #if os(iOS)
             backgroundPreviewSection
+            appLockSection
             #endif
         }
         .formStyle(.grouped)
         .navigationTitle(String(localized: "过滤"))
+        #if os(iOS)
+        .alert("앱 잠금", isPresented: Binding(
+            get: { appLockError != nil },
+            set: { if !$0 { appLockError = nil } }
+        )) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text(appLockError ?? "")
+        }
+        #endif
     }
 
     private func rankingModeBinding(for mode: IllustRankingMode) -> Binding<Bool> {
@@ -138,6 +153,29 @@ struct PrivacySettingsView: View {
     }
 
     #if os(iOS)
+    private var appLockSection: some View {
+        Section {
+            Toggle(
+                "\(appLock.methodName)로 앱 잠금",
+                isOn: Binding(
+                    get: { appLock.isEnabled },
+                    set: { newValue in
+                        Task {
+                            let changed = await appLock.setEnabled(newValue)
+                            if !changed, let message = appLock.lastError {
+                                appLockError = message
+                            }
+                        }
+                    }
+                )
+            )
+        } header: {
+            Text("앱 잠금")
+        } footer: {
+            Text("켜면 앱을 열 때와 백그라운드에서 돌아올 때 인증해야 합니다. 생체인식이 안 되면 기기 암호로 해제할 수 있습니다.")
+        }
+    }
+
     private var backgroundPreviewSection: some View {
         Section {
             Toggle(

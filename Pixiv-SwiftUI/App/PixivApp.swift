@@ -144,6 +144,7 @@ struct ContentView: View {
     #endif
     #if os(iOS)
     @Environment(\.scenePhase) private var scenePhase
+    private var appLock = AppLockManager.shared
     #endif
 
     var body: some View {
@@ -188,12 +189,27 @@ struct ContentView: View {
                 showAuthView = true
             }
             updateAppPreviewProtection()
+            AppLockPresenter.shared.update(isLocked: appLock.isLocked)
+            if appLock.isLocked {
+                Task { await appLock.unlock() }
+            }
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active, authSheetWasPresented {
                 showAuthView = true
             }
             updateAppPreviewProtection()
+            if newPhase == .background {
+                appLock.lockIfNeeded()
+            } else if newPhase == .active, appLock.isLocked {
+                Task { await appLock.unlock() }
+            }
+        }
+        .onChange(of: appLock.isLocked) { _, locked in
+            AppLockPresenter.shared.update(isLocked: locked)
+            if locked, scenePhase == .active {
+                Task { await appLock.unlock() }
+            }
         }
         .onChange(of: userSettingStore.userSetting.blurAppPreviewInBackground) { _, _ in
             updateAppPreviewProtection()
