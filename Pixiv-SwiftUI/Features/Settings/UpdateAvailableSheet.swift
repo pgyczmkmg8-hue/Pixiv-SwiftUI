@@ -29,7 +29,7 @@ struct UpdateAvailableSheet: View {
                 .font(.system(size: 50))
                 .foregroundStyle(.blue)
 
-            Text("发现新版本")
+            Text("새 버전이 있습니다")
                 .font(.title2)
                 .fontWeight(.semibold)
 
@@ -45,19 +45,8 @@ struct UpdateAvailableSheet: View {
             .frame(maxHeight: 200)
             #endif
 
-            HStack(spacing: 12) {
-                Button("关闭") {
-                    isPresented = false
-                }
-                .buttonStyle(.bordered)
-
-                Button("跳过此版本") {
-                    onSkip()
-                    isPresented = false
-                }
-                .buttonStyle(.bordered)
-
-                Button(canInstallWithFeather ? "Feather로 설치" : "查看更新") {
+            VStack(spacing: 10) {
+                Button {
                     if canInstallWithFeather {
                         Task {
                             let opened = await UpdateChecker.shared.installWithFeather(version: updateInfo.version)
@@ -70,8 +59,36 @@ struct UpdateAvailableSheet: View {
                         openReleasePage()
                         isPresented = false
                     }
+                } label: {
+                    Text(canInstallWithFeather ? "Feather로 설치" : "릴리즈 보기")
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+
+                HStack(spacing: 10) {
+                    Button {
+                        isPresented = false
+                    } label: {
+                        Text("닫기")
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        onSkip()
+                        isPresented = false
+                    } label: {
+                        Text("이 버전 건너뛰기")
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                }
             }
         }
         .padding(30)
