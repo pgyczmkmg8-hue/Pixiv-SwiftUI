@@ -194,7 +194,7 @@ struct AboutSettingsView: View {
         } header: {
             Text("업데이트")
         } footer: {
-            Text("저장소가 공개라면 토큰은 필요 없습니다. 토큰이 있으면 Feather 바로 설치 대신 릴리즈 페이지가 열립니다.")
+            Text("비공개 저장소는 읽기 전용 토큰(read_api)이 필요합니다. 새 버전 알림에서 \"Feather로 설치\"를 누르면 토큰이 포함된 주소가 Feather로 전달됩니다.")
         }
     }
 

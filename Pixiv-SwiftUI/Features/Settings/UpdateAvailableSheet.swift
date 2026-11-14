@@ -11,11 +11,7 @@ struct UpdateAvailableSheet: View {
     let onSkip: () -> Void
 
     private var canInstallWithFeather: Bool {
-        #if os(iOS)
-        updateInfo.downloadUrl != nil && UpdateChecker.shared.canInstallWithFeather
-        #else
-        false
-        #endif
+        UpdateChecker.shared.canInstallWithFeather
     }
 
     private func openReleasePage() {
@@ -62,9 +58,9 @@ struct UpdateAvailableSheet: View {
                 .buttonStyle(.bordered)
 
                 Button(canInstallWithFeather ? "Feather로 설치" : "查看更新") {
-                    if canInstallWithFeather, let downloadUrl = updateInfo.downloadUrl {
+                    if canInstallWithFeather {
                         Task {
-                            let opened = await UpdateChecker.shared.installWithFeather(downloadUrl: downloadUrl)
+                            let opened = await UpdateChecker.shared.installWithFeather(version: updateInfo.version)
                             if !opened {
                                 openReleasePage()
                             }

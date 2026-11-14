@@ -246,15 +246,30 @@ final class UpdateChecker {
 
     // MARK: - Install
 
-    /// Feather 앱으로 IPA를 바로 설치한다. 토큰이 필요한 비공개 저장소의 파일은 Feather가 받을 수 없고,
-    /// 토큰을 주소에 넣으면 노출되므로 토큰이 저장돼 있으면 쓰지 않는다.
-    var canInstallWithFeather: Bool {
-        !hasToken
+    /// GitLab 패키지 저장소의 IPA 주소. 릴리즈할 때 `Pixiv-SwiftUI/<버전>/Pixiv-SwiftUI.ipa`로 올려 둔다.
+    /// 비공개 저장소라서 저장된 토큰이 있으면 `private_token`으로 붙인다(Feather가 로그인 없이 받을 수 있게).
+    func packageDownloadURL(version: String) -> String {
+        let encodedPath = Self.repositoryPath.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
+        var url = "https://gitlab.com/api/v4/projects/\(encodedPath)/packages/generic/Pixiv-SwiftUI/\(Self.normalizedVersion(version))/Pixiv-SwiftUI.ipa"
+        let token = savedToken
+        if !token.isEmpty {
+            url += "?private_token=\(token)"
+        }
+        return url
     }
 
-    func installWithFeather(downloadUrl: String) async -> Bool {
+    var canInstallWithFeather: Bool {
         #if os(iOS)
-        guard canInstallWithFeather, let url = URL(string: "feather://install/\(downloadUrl)") else {
+        true
+        #else
+        false
+        #endif
+    }
+
+    /// Feather로 IPA를 바로 설치한다. Feather가 없어서 열 수 없으면 false.
+    func installWithFeather(version: String) async -> Bool {
+        #if os(iOS)
+        guard let url = URL(string: "feather://install/\(packageDownloadURL(version: version))") else {
             return false
         }
         return await UIApplication.shared.open(url)
