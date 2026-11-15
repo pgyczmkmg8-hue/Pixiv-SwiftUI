@@ -30,7 +30,7 @@ private struct MainTabViewNew: View {
         #if os(macOS)
         true
         #else
-        horizontalSizeClass == .regular
+        horizontalSizeClass == .regular && UIDevice.current.userInterfaceIdiom != .phone
         #endif
     }
 
@@ -101,7 +101,7 @@ private struct MainTabViewLegacy: View {
         #if os(macOS)
         true
         #else
-        horizontalSizeClass == .regular
+        horizontalSizeClass == .regular && UIDevice.current.userInterfaceIdiom != .phone
         #endif
     }
 

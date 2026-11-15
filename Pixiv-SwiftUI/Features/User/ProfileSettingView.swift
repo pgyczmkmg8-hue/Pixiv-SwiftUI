@@ -16,7 +16,7 @@ struct ProfileSettingView: View {
         #if os(macOS)
         true
         #else
-        horizontalSizeClass == .regular
+        horizontalSizeClass == .regular && UIDevice.current.userInterfaceIdiom != .phone
         #endif
     }
 
